@@ -22,7 +22,7 @@
 
 ## Introdução
 
-Este projeto é uma aplicação Delphi, desenvolvida como forma de desafio técnico para o processo seletivo para a vaga de programador Delphi. A aplicação registra pedidos e seus respectivos produtos, possibilitano a inclusão, alteração e exclusão de pedidos e seus respectivos itens, além da pesquisa pelo codigo da venda ou através de uma interface de pequisa, permitindo a navegação entre registros, exibindo ou atualizando os dados armazenados no banco de dados.
+Este projeto é uma aplicação Delphi, desenvolvida como forma de desafio técnico para o processo seletivo para a vaga de programador Delphi. A aplicação registra pedidos e seus respectivos produtos, possibilitando a inclusão, alteração e exclusão de pedidos e seus respectivos itens, além da pesquisa pelo código da venda ou através de uma interface de pequisa, permitindo a navegação entre registros, exibindo ou atualizando os dados armazenados no banco de dados.
 
 ![image](https://github.com/user-attachments/assets/993bd200-3ada-4369-8027-2df6483e16e2)
 
@@ -36,25 +36,34 @@ Na pasta do projeto, encontra-se o arquivo *testeWK.ini* contendo as informaçõ
 
 [Abrir PDF](Instrução para configuração do banco de dados a ser utilizado.pdf)
 
-Com qualquer editor de arquivos TXT (ex: bloco de notas), alterar na ultima linha a informação "Address" com a informação que consta no *"Nome do Servidor"* ao se conectar no SQL Server do seu computador.
+Com qualquer editor de arquivos TXT (ex: bloco de notas), é possível fazer as alterações no arquivo *testeWK.ini" para que seja possível realizar a conexão ao banco de dados e consequentemente, executar a apliacação sem erros.
 
 ## Arquitetura
 
 A arquitetura do projeto segue o padrão MVC (Model-View-Controller), que permite uma separação clara de responsabilidades:
 
-- **Model**: Contém as classes que representam os dados da aplicação e a lógica de negócios (por exemplo, `TEndereco`, `TCEPService`).
-- **View**: São os formulários Delphi que apresentam a interface do usuário (por exemplo, `FrmMain`, `FrmSelecionaCep`).
+- **Model**: Contém as classes que representam os dados da aplicação e a lógica de negócios (por exemplo, `TProduto`, `TVendas`).
+- **View**: São os formulários Delphi que apresentam a interface do usuário (por exemplo, `FrmMain`, `FrmCadVenda`).
 - **Controller**: Realiza a comunicação entre o Model e a View, gerenciando a lógica de interação do usuário.
 
 ## Dicas de Uso
 
 ![image](https://github.com/user-attachments/assets/3d2ba708-8f40-4a4b-841f-31090fbc32fa)
 
-A interface principal da aplicação é apresenrada contendo os botões de ação (Incluir, Alterar, Excluir, Gravar, Cancelar e Sair), as opções de Pesquisa (por CEP ou por Endereço) e a forma de retorno da pesquisa (arquivo JSON ou arquivo XML). Logo abaixo o serão exibidos o campo a pesquisar, os botões para pesquisar ou limpar os campos, todos os campos a serem preenchidos, além de um grid contendo todos os logradouros e suas respectivas informações (CEP, localidade, bairro, estado e complemento) cadastrados na base de dados. 
+A interface principal da aplicação é apresentada contendo os botões de opções (Produtos, Vendas e Sair), Através dessa interface que serão abertas as telas de uso da aplicação. 
 
-### Pesquisa por CEP
+### Cadastro de Produtos
 
-![image](https://github.com/user-attachments/assets/8f3f04b6-63c0-460b-b1df-999b20c92417)
+![image](https://github.com/user-attachments/assets/1e83bea7-b09f-457d-a2f6-aa486598b996)
+
+Na interface principal, ao clicar no botão **"Produtos"**, será exibida a interface de produtos, contendo os dados do produto, uma grade contendo todos os produtos cadastrados, uma área para pesquisa no grid (podendo ser alterada a forma de pesquisa por descrição ou codigo do produto), além dos botões de ação (Incluir, Alterar, Excluir, Gravar, Cancelar e Sair), localizados acima da tela.
+
+Para selecionar um registro da grade, basta dar um duplo click no registro escolhido, que todas as informações do produtos serão mostradas na área destinada aos dados do produto. Pode-se também, navegar pela grade usando as setas e ao acionar a tecla <Enter> o registro será exibido na área de dados do produto, ja em estado de edição.
+
+- Botão Inserir: Ao clicar no botão "**Inserir**", será liberada a área de dados do produto para a digitação das informações para a inclusão de um novo produto. Nesse momento, os botoes "**Gravar**" e "**Cancelar**" ficam habilitados e os demais botões ficam desabilitados, ficando para o usuário as opções de gravar o produto ou cancelar a inclusão.
+
+- Botão Alterar: Após selecionar um registo na grade, fica habilitado o botão "**Alterar**"Ao clicar no botão "**Inserir**", será liberada a área de dados do produto para a digitação das informações para a inclusão de um novo produto. Nesse momento, os botoes "**Gravar**" e "**Cancelar**" ficam habilitados e os demais botões ficam desabilitados, ficando para o usuário as opções de gravar o produto ou cancelar a inclusão.
+
 
 Ao Informar o cep a pesquisar e clicar no botão "Pesquisar", será preenchido automaticamente os campos relacionados ao endereço, ficando disponível para o usuário efetuar qualquer alteração nas informações obtidas atraves da API do ViaCep. Nesse momento é habilitado o botão "Inserir" e o botão "Cancelar", ficando desabilidado o grid e os demais botões. Caso deseje inserir o registro, basta clicar no botão "Inserir" que o mesmo será adicionado a base de dados existente, caso contrário, clicar no botão "cancelar" que a interface voltará ao estado inicial dela.
 
