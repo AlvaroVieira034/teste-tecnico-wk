@@ -1,6 +1,6 @@
-# Projeto de Consulta de Endereços e CEPs
+# Cadastro de pedidos e seus itens
 
-## Desafio técnico - Softplan
+## Desafio técnico - WK Technology
 
 ## Menu
 
@@ -22,19 +22,19 @@
 
 ## Introdução
 
-Este projeto é uma aplicação Delphi que consome e retorna endereços e CEPs através da API pública do ViaCEP. Possibilita consultas por CEP ou endereço completo, permitindo a navegação entre registros, exibindo ou atualizando os dados armazenados no banco de dados.
+Este projeto é uma aplicação Delphi, desenvolvida como forma de desafio técnico para o processo seletivo para a vaga de programador Delphi. A aplicação registra pedidos e seus respectivos produtos, possibilitano a inclusão, alteração e exclusão de pedidos e seus respectivos itens, além da pesquisa pelo codigo da venda ou através de uma interface de pequisa, permitindo a navegação entre registros, exibindo ou atualizando os dados armazenados no banco de dados.
 
-![image](https://github.com/user-attachments/assets/80b49ba6-49f7-48e9-b2a6-d09925138137)
+![image](https://github.com/user-attachments/assets/993bd200-3ada-4369-8027-2df6483e16e2)
 
 
 ## Configurações
 
-Para que seja possível a execução da aplicação, é necessário que seja criado um banco de dados MSSQL Server, cujo script para criação do banco de dados (*script criação de tabelas.sql*)
-, criação das tabelas utilizadas na aplicação e população de registros na tabela de CEPs, encontra-se disponível dentro do projeto. 
+Para que seja possível a execução da aplicação, é necessário que seja criado um banco de dados MySQL ou MSSQL Server, cujo os scripts para criação do banco de dados (*Script Criação de
+Tabelas MySQL.sql e Script Criação de Tabelas MSSQL.sql*), criação das tabelas utilizadas na aplicação e população de registros nas tabelas, encontra-se disponível dentro do projeto. 
 
-Na pasta do projeto, encontra-se o arquivo *consultacep.ini* contendo as informações necessárias para que a aplicação conecte com o banco de dados criado anteriormente.
+Na pasta do projeto, encontra-se o arquivo *testeWK.ini* contendo as informações necessárias para que a aplicação conecte com o banco de dados criado anteriormente. Também encontra-se na pasta do projeto o arquivo *Instrução para configuração do banco de dados a ser utilizado.pdf*, contendo todas as instruções para execução do script de criação das tabelas e configuração do arquivo *testeWK.ini".
 
-![image](https://github.com/user-attachments/assets/93d27d46-4750-446f-a354-92af05465556)
+[Abrir PDF](Instrução para configuração do banco de dados a ser utilizado.pdf)
 
 Com qualquer editor de arquivos TXT (ex: bloco de notas), alterar na ultima linha a informação "Address" com a informação que consta no *"Nome do Servidor"* ao se conectar no SQL Server do seu computador.
 
