@@ -1,0 +1,67 @@
+unit vendaitens.controller;
+
+interface
+
+uses umain, vendaitens.model, vendaitensrepository.model, system.SysUtils, Vcl.Forms, FireDAC.Comp.Client;
+
+type
+  TCampoInvalido = (ciData, ciDescricao, ciCliente, ciValor, ciValorZero);
+  TVendaItensController = class
+
+  private
+    FVendaItens: TVendaItem;
+    FVendaItensRepo: TVendaItemRepository;
+
+  public
+    constructor Create();
+    destructor Destroy; override;
+    function Carregar(QryVendasItens: TFDQuery; FVenda: TVenda; ACodigo: Integer): Boolean;
+    function Inserir(QryVendasItens: TFDQuery; FVenda: TVenda; Transacao: TFDTransaction; var sErro: string): Boolean;
+    function Alterar(QryVendasItens: TFDQuery; FVenda: TVenda; Transacao: TFDTransaction; ACodigo: Integer; sErro: string): Boolean;
+    function Excluir(QryVendasItens: TFDQuery; Transacao: TFDTransaction; ACodigo: Integer; var sErro: string): Boolean;
+    function ValidarDados(const ACodProduto, AQuantidade, APrecoUnitario, ATotalItem: string; out AErro: TCampoInvalido): Boolean;
+
+
+  end;
+
+implementation
+
+{ TVendaItensController }
+
+constructor TVendaItensController.Create;
+begin
+
+end;
+
+destructor TVendaItensController.Destroy;
+begin
+
+  inherited;
+end;
+
+function TVendaItensController.Carregar(QryVendasItens: TFDQuery; FVenda: TVenda; ACodigo: Integer): Boolean;
+begin
+
+end;
+
+function TVendaItensController.Inserir(QryVendasItens: TFDQuery; FVenda: TVenda; Transacao: TFDTransaction; var sErro: string): Boolean;
+begin
+
+end;
+
+function TVendaItensController.Alterar(QryVendasItens: TFDQuery; FVenda: TVenda; Transacao: TFDTransaction; ACodigo: Integer; sErro: string): Boolean;
+begin
+
+end;
+
+function TVendaItensController.Excluir(QryVendasItens: TFDQuery; Transacao: TFDTransaction; ACodigo: Integer; var sErro: string): Boolean;
+begin
+
+end;
+
+function TVendaItensController.ValidarDados(const ACodProduto, AQuantidade, APrecoUnitario, ATotalItem: string; out AErro: TCampoInvalido): Boolean;
+begin
+
+end;
+
+end.

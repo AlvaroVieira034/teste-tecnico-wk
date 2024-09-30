@@ -1,0 +1,75 @@
+unit vendaitens.controller;
+
+interface
+
+uses venda.model, vendarepository.model, system.SysUtils, Vcl.Forms, FireDAC.Comp.Client;
+
+Type
+  TVendaItensController = class
+  private
+    FCod_Venda: Integer;
+    FCod_Produto: Integer;
+    FDes_Descricao: string;
+    FVal_PrecoUnitario: Double;
+    FVal_Quantidade: Integer;
+    FVal_TotalVenda: Double;
+    procedure SetCod_Produto(const Value: Integer);
+
+  public
+    {procedure Carregar(VendaItens: TVendaItens; iCodigo: Integer);
+    procedure Pesquisar(VendaItens: TVendaItens; iCodigo: Integer);
+    function Inserir(VendaItens: TVendaItens; out sErro: String): Boolean;
+    function Alterar(VendaItens: TVendaItens; iCodigo: Integer; out sErro: String): Boolean;
+    function Excluir(iCodigo: Integer; out sErro : String): Boolean;}
+
+    property Cod_Venda: Integer read FCod_Venda write FCod_Venda;
+    property Cod_Produto: Integer read FCod_Produto write SetCod_Produto;
+    property Des_Descricao: string read FDes_Descricao write FDes_Descricao;
+    property Val_Quantidade: Integer read FVal_Quantidade write FVal_Quantidade;
+    property Val_PrecoUnitario: Double read FVal_PrecoUnitario write FVal_PrecoUnitario;
+    property Val_TotalVenda: Double read FVal_TotalVenda write FVal_TotalVenda;
+
+  end;
+
+implementation
+
+uses ucadvenda;
+
+
+{ TVendaItens }
+
+{
+procedure TVendaItensController.Pesquisar(VendaItens: TVendaItens; iCodigo: Integer);
+begin
+
+end;
+
+procedure TVendaItensController.Carregar(VendaItens: TVendaItensController; iCodigo: Integer);
+begin
+
+end;
+
+function TVendaItensController.Inserir(VendaItens: TVendaItensController; out sErro: String): Boolean;
+begin
+
+end;
+
+function TVendaItensController.Alterar(VendaItens: TVendaItensController; iCodigo: Integer; out sErro: String): Boolean;
+begin
+
+end;
+
+function TVendaItensController.Excluir(iCodigo: Integer; out sErro: String): Boolean;
+begin
+
+end;
+
+}
+
+procedure TVendaItensController.SetCod_Produto(const Value: Integer);
+begin
+
+end;
+
+
+end.

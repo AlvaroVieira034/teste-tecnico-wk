@@ -1,0 +1,53 @@
+unit cliente.controller;
+
+interface
+
+uses cliente.model, clienterepository.model, conexao.model, System.SysUtils, FireDAC.Comp.Client, FireDAC.Stan.Param;
+
+type
+  TCampoInvalido = (ciData, ciCliente, ciValor, ciValorZero);
+  TClienteController = class
+  public
+    procedure PreencherGrid(TblClientes: TFDQuery; APesquisa, ACampo: string);
+    procedure CarregarCampos(QryClientes: TFDQuery; FCliente: TCliente; ACodigo: Integer);
+    function Inserir(QryClientes: TFDQuery; FCliente: TCliente; Transacao: TFDTransaction; out sErro: string): Boolean;
+    function Alterar(QryClientes: TFDQuery; FCliente: TCliente; Transacao: TFDTransaction; ACodigo: Integer; out sErro: string): Boolean;
+    function Excluir(QryClientes: TFDQuery; Transacao: TFDTransaction; ACodigo: Integer; out sErro : string): Boolean;
+
+  end;
+
+
+implementation
+
+{ TClienteController }
+
+function TClienteController.Alterar(QryClientes: TFDQuery; FCliente: TCliente; Transacao: TFDTransaction; ACodigo: Integer; out sErro: string): Boolean;
+begin
+
+end;
+
+procedure TClienteController.CarregarCampos(QryClientes: TFDQuery;
+  FCliente: TCliente; ACodigo: Integer);
+begin
+
+end;
+
+function TClienteController.Excluir(QryClientes: TFDQuery;
+  Transacao: TFDTransaction; ACodigo: Integer; out sErro: string): Boolean;
+begin
+
+end;
+
+function TClienteController.Inserir(QryClientes: TFDQuery; FCliente: TCliente;
+  Transacao: TFDTransaction; out sErro: string): Boolean;
+begin
+
+end;
+
+procedure TClienteController.PreencherGrid(TblClientes: TFDQuery; APesquisa,
+  ACampo: string);
+begin
+
+end;
+
+end.
