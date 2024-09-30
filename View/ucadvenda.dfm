@@ -167,6 +167,7 @@ inherited FrmCadVenda: TFrmCadVenda
         Top = 25
         Width = 29
         Height = 23
+        Hint = 'Pesquisar'
         Font.Charset = ANSI_CHARSET
         Font.Color = clWindowText
         Font.Height = -13
@@ -200,6 +201,8 @@ inherited FrmCadVenda: TFrmCadVenda
           FFFFFFFFFFFFFFFFFFFFFFFFFFFEFEFEE3DCDBCBB0A0D2A57DD8AA7DCEAE90D1
           C1B8F0EDEDFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF}
         ParentFont = False
+        ParentShowHint = False
+        ShowHint = True
         OnClick = BtnPesquisarClick
       end
       object EdtCodVenda: TEdit
