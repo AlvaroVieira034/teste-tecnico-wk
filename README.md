@@ -76,15 +76,12 @@ Na interface principal, ao clicar no botão **"Vendas"**, será exibida a interf
 
 Para acessar uma venda cadastrada o usuário pode informar o codigo da venda no campo apropriado e em seguida clicar no botão "**Pesquisar**" ![image](https://github.com/user-attachments/assets/8c758810-f359-4726-9c42-725121ab0de5)
 
-
 ![image](https://github.com/user-attachments/assets/55b18375-874f-4112-8bf1-13db6bfcb70d)
 
+Caso o usuário deseje fazer uma pesquisa de todas as vendas cadastradas, basta clicar no botão pesquisar ![image](https://github.com/user-attachments/assets/350a073e-1446-4d00-80af-bba2e3c74708) e será exibida uma tela contendo todas as vendas cadastradas para que o usuário escolha a venda desejada.
 
-Ao Informar o cep a pesquisar e clicar no botão "Pesquisar", será preenchido automaticamente os campos relacionados ao endereço, ficando disponível para o usuário efetuar qualquer alteração nas informações obtidas atraves da API do ViaCep. Nesse momento é habilitado o botão "Inserir" e o botão "Cancelar", ficando desabilidado o grid e os demais botões. Caso deseje inserir o registro, basta clicar no botão "Inserir" que o mesmo será adicionado a base de dados existente, caso contrário, clicar no botão "cancelar" que a interface voltará ao estado inicial dela.
+![image](https://github.com/user-attachments/assets/0a6eea29-7b8a-425a-8a85-51cd3a2b55a0)
 
-Para alterar ou excluir um registro incluido na base de dados, existe duas formas: efetuando om click duplo no registro escolhido no grid de endereços cadaastrados, nesse caso, será preenchido todos os campos relacionados ao endereço e ficando habilitado os botões "Alterar", "Excluir" e "Sair", conforme mostrado abaixo:
-
-![image](https://github.com/user-attachments/assets/5a96e1d1-b4b8-4412-b19a-d72e366b7054)
 
 Para alterar as informações, clicar no botão "Alterar" e realizar as alterações necessárias. Após efetuar as alterações clicar no botão "Gravar" para que as alterações sejam persistidas no banco de dados, caso contrário, clicar no botão "Cancelar" que as alterações serão desfeitas e a interface volta ao estado inicial dela.
 
