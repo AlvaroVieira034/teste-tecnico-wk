@@ -48,7 +48,7 @@ A arquitetura do projeto segue o padrão MVC (Model-View-Controller), que permit
 
 ## Dicas de Uso
 
-![image](https://github.com/user-attachments/assets/3d2ba708-8f40-4a4b-841f-31090fbc32fa)
+![image](https://github.com/user-attachments/assets/f7ce5e85-4da6-4176-8452-04bda2d12deb)
 
 A interface principal da aplicação é apresentada contendo os botões de opções (Produtos, Vendas e Sair), Através dessa interface que serão abertas as telas de uso da aplicação. 
 
