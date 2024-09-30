@@ -68,7 +68,7 @@ Para selecionar um registro da grade, basta dar um duplo click no registro escol
 
 - Botão Sair: Fecha a tela do cadastro de produtos e retorna ao menu inicial.
 
-  ### Cadastro de Vendas
+### Cadastro de Vendas
 
 ![image](https://github.com/user-attachments/assets/3d338fd6-4e9b-4538-8767-4d14d9be63cf)
 
