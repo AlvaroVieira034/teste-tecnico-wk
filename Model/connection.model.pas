@@ -5,13 +5,14 @@ interface
 uses FireDAC.Stan.Intf, FireDAC.Stan.Option,  FireDAC.Stan.Error, FireDAC.UI.Intf,
      FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async,
      FireDAC.Phys, FireDAC.VCLUI.Wait, Data.DB, FireDAC.Comp.Client, System.SysUtils,
-     FireDAC.Phys.MySQL, FireDAC.Phys.MSSQL;
+     FireDAC.Phys.MySQL, FireDAC.Phys.MSSQL, System.IniFiles, System.IOUtils;
 
 type
   TConnection = class
     private
       FConexao: TFDConnection;
       FTransacao: TFDTransaction;
+      procedure LerConfiguracaoINI;
 
     public
       constructor Create;
@@ -33,11 +34,70 @@ uses Vcl.Dialogs;
 
 constructor TConnection.Create;
 var FDPhysMSSQL: TFDPhysMSSQLDriverLink;
-//var FDPhysMySQL: TFDPhysMySQLDriverLink;
+    FDPhysMySQL: TFDPhysMySQLDriverLink;
+    Banco: string;
+    Ini: TIniFile;
+    IniFileName: string;
 begin
   inherited Create;
-  {Configurações da conexão para MySql
+  // Caminho do arquivo INI
+  IniFileName := TPath.Combine(TPath.GetDirectoryName(ParamStr(0)), 'testewk.ini');
+
+  // Carregar o arquivo INI
+  Ini := TIniFile.Create(IniFileName);
+  try
+    // Ler o tipo de banco de dados configurado
+    Banco := Ini.ReadString('DatabaseConfig', 'Banco', '');
+
+    if Banco = 'MSSQL' then
+    begin
+      // Configuração para MSSQL
+      FDPhysMSSQL := TFDPhysMSSQLDriverLink.Create(nil);
+
+      FConexao := TFDConnection.Create(nil);
+      FConexao.Params.DriverID := 'MSSQL';
+      FConexao.Params.Database := Ini.ReadString('Database', 'Database', 'TESTEWK');
+      FConexao.Params.UserName := Ini.ReadString('Database', 'UserName', 'sa');
+      FConexao.Params.Password := Ini.ReadString('Database', 'Password', 'info');
+      FConexao.Params.Add('Server=' + Ini.ReadString('Database', 'Server', 'PC-ALVARO\SQLEXPRESS'));
+      FConexao.Params.Add('Port=' + Ini.ReadString('Database', 'Port', '1433'));
+      FConexao.LoginPrompt := False;
+    end
+    else if Banco = 'MYSQL' then
+    begin
+      // Configuração para MySQL
+      FDPhysMySQL := TFDPhysMySQLDriverLink.Create(nil);
+      FDPhysMySQL.VendorLib := 'c:\windows\system32\libmysql.dll';
+
+      FConexao := TFDConnection.Create(nil);
+      FConexao.Params.DriverID := 'MySQL';
+      FConexao.Params.Database := Ini.ReadString('Database', 'Database', 'testewk');
+      FConexao.Params.UserName := Ini.ReadString('Database', 'UserName', 'root');
+      FConexao.Params.Password := Ini.ReadString('Database', 'Password', '');
+      FConexao.Params.Add('Server=' + Ini.ReadString('Database', 'Server', 'localhost'));
+      FConexao.Params.Add('Port=' + Ini.ReadString('Database', 'Port', '3307'));
+      FConexao.Params.Add('AuthMode=Normal');
+      FConexao.LoginPrompt := False;
+    end
+    else
+      raise Exception.Create('Banco de dados não configurado corretamente no arquivo INI.');
+
+    // Criação da transação
+    FTransacao := TFDTransaction.Create(nil);
+    FTransacao.Connection := FConexao;
+    FConexao.Transaction := FTransacao;
+
+    TestarConexao;
+  finally
+    Ini.Free;
+  end;
+
+
+
+{
+  //Configurações da conexão para MySql
   FDPhysMySQL := TFDPhysMySQLDriverLink.Create(nil);
+  FDPhysMySQL.VendorLib := 'c:\windows\system32\libmysql.dll';
 
   FConexao := TFDConnection.Create(nil);
   FConexao.Params.DriverID := 'MySQL';
@@ -45,12 +105,12 @@ begin
   FConexao.Params.UserName := 'root';
   FConexao.Params.Password := '';
   FConexao.Params.Add('Server=localhost');  // Endereço do servidor MySQL
-  FConexao.Params.Add('Port=3306');         // Porta do MySQL
+  FConexao.Params.Add('Port=3307');         // Porta do MySQL
   FConexao.Params.Add('AuthMode=Normal');   // Autenticação padrão
   FConexao.LoginPrompt := False;}
 
   // Cria Conexão para SQL Server
-  FDPhysMSSQL := TFDPhysMSSQLDriverLink.Create(nil);
+  {FDPhysMSSQL := TFDPhysMSSQLDriverLink.Create(nil);
 
   FConexao := TFDConnection.Create(nil);
   FConexao.Params.DriverID := 'MSSQL';
@@ -58,12 +118,12 @@ begin
   FConexao.Params.UserName := 'SA';
   FConexao.Params.Password := 'info';
   FConexao.Params.Add('ADDRESS=PC-ALVARO\SQLEXPRESS');
-  FConexao.LoginPrompt := False;
+  FConexao.LoginPrompt := False;}
 
-  // Transação
+  {// Transação
   FTransacao := TFDTransaction.Create(nil);
   FTransacao.Connection := FConexao;
-  FConexao.Transaction := FTransacao;
+  FConexao.Transaction := FTransacao;}
 
   TestarConexao;
 end;
@@ -123,6 +183,34 @@ begin
     FTransacao.Connection := FConexao;
     FTransacao.StartTransaction;
   end;
+end;
+
+procedure TConnection.LerConfiguracaoINI;
+var Ini: TIniFile;
+    IniFileName: string;
+begin
+  // Caminho do arquivo INI
+  IniFileName := TPath.Combine(TPath.GetDirectoryName(ParamStr(0)), 'testewk.ini');
+
+  // Verifica se o arquivo INI existe
+  if not FileExists(IniFileName) then
+    raise Exception.Create('Arquivo testewk.ini não encontrado!');
+
+   // Carregar o arquivo INI
+  Ini := TIniFile.Create(IniFileName);
+  try
+    FConexao.Params.Values['Banco'] := Ini.ReadString('DatabaseConfig', 'Banco', 'MySQL');
+    FConexao.Params.DriverID := Ini.ReadString('Database', 'DriverID', '');
+    FConexao.Params.Database := Ini.ReadString('Database', 'Database', '');
+    FConexao.Params.UserName := Ini.ReadString('Database', 'UserName', '');
+    FConexao.Params.Password := Ini.ReadString('Database', 'Password', '');
+    FConexao.Params.Add('Server=' + Ini.ReadString('Database', 'Server', ''));
+    FConexao.Params.Add('Port=' + Ini.ReadString('Database', 'Port', '3307')); // Porta padrão
+    FConexao.LoginPrompt := False;
+  finally
+    Ini.Free;
+  end;
+
 end;
 
 end.
