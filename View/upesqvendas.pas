@@ -101,6 +101,7 @@ procedure TFrmPesquisaVendas.DbGridPedidosDblClick(Sender: TObject);
 begin
   FrmCadVenda.codigoVenda := DsVendas.DataSet.FieldByName('COD_VENDA').AsInteger;
   FrmCadVenda.pesqVenda := True;
+  FrmCadVenda.FOperacao := opNavegar;
   BtnSair.Click;
 end;
 
@@ -110,6 +111,7 @@ begin
   begin
     FrmCadVenda.codigoVenda := DsVendas.DataSet.FieldByName('COD_VENDA').AsInteger;
     FrmCadVenda.pesqVenda := True;
+    FrmCadVenda.FOperacao := opEditar;
     BtnSair.Click;
     Key := 0;
   end;
@@ -177,6 +179,7 @@ procedure TFrmPesquisaVendas.BtnSelecionarClick(Sender: TObject);
 begin
   FrmCadVenda.codigoVenda := DsVendas.DataSet.FieldByName('COD_VENDA').AsInteger;
   FrmCadVenda.pesqVenda := True;
+  FrmCadVenda.FOperacao := opNavegar;
   BtnSair.Click;
 end;
 

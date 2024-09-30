@@ -15,7 +15,8 @@ type
   public
     constructor Create();
     destructor Destroy; override;
-    procedure PreencherGrid(TblProdutos: TFDQuery; sPesquisa, sCampo: string);
+    procedure PreencherGrid(TblProdutos: TFDQuery; APesquisa, ACampo: string);
+    procedure PreencherComboProduto(TblProdutos: TFDQuery);
     function CarregarCampos(QryProdutos: TFDQuery; FProduto: TProduto; iCodigo: Integer): Boolean;
     function Inserir(QryProdutos: TFDQuery; FProduto: TProduto; Transacao: TFDTransaction; var sErro: string): Boolean;
     function Alterar(QryProdutos: TFDQuery; FProduto: TProduto; Transacao: TFDTransaction; iCodigo: Integer; sErro: string): Boolean;
@@ -42,19 +43,24 @@ begin
   inherited;
 end;
 
-procedure TProdutoController.PreencherGrid(TblProdutos: TFDQuery; sPesquisa, sCampo: string);
-var lCampo, sErro: string;
+procedure TProdutoController.PreencherGrid(TblProdutos: TFDQuery; APesquisa, ACampo: string);
+var LCampo, sErro: string;
 begin
-  if sCampo = 'Código' then
-    lCampo := 'prd.cod_produto';
+  if ACampo = 'Código' then
+    LCampo := 'prd.cod_produto';
 
-  if sCampo = 'Nome' then
-    lCampo := 'prd.des_descricao';
+  if ACampo = 'Descrição' then
+    LCampo := 'prd.des_descricao';
 
-  if sCampo = '' then
-    lCampo := 'prd.des_descricao';
+  if ACampo = '' then
+    LCampo := 'prd.des_descricao';
 
-  FProdutoRepo.PreencherGrid(TblProdutos, sPesquisa, lCampo);
+  FProdutoRepo.PreencherGrid(TblProdutos, APesquisa, LCampo);
+end;
+
+procedure TProdutoController.PreencherComboProduto(TblProdutos: TFDQuery);
+begin
+  FProdutoRepo.PreencherComboProduto(TblProdutos);
 end;
 
 function TProdutoController.CarregarCampos(QryProdutos: TFDQuery; FProduto: TProduto; iCodigo: Integer): Boolean;

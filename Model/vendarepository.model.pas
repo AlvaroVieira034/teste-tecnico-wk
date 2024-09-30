@@ -57,13 +57,16 @@ begin
     ParamByName('COD_VENDA').AsInteger := ACodigo;
     Open();
 
-    with FVenda, QryVendas do
+    if not QryVendas.Eof then
     begin
-      Cod_Venda := FieldByName('COD_VENDA').AsInteger;
-      Dta_Venda := FieldByName('DTA_VENDA').AsDateTime;
-      Cod_Cliente := FieldByName('COD_CLIENTE').AsInteger;
-      Des_Cliente := FieldByName('DES_CLIENTE').AsString;
-      Val_Venda := FieldByName('VAL_VENDA').AsFloat;
+      with FVenda, QryVendas do
+      begin
+        Cod_Venda := FieldByName('COD_VENDA').AsInteger;
+        Dta_Venda := FieldByName('DTA_VENDA').AsDateTime;
+        Cod_Cliente := FieldByName('COD_CLIENTE').AsInteger;
+        Des_Cliente := FieldByName('DES_CLIENTE').AsString;
+        Val_Venda := FieldByName('VAL_VENDA').AsFloat;
+      end;
     end;
   end;
 end;

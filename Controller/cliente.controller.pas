@@ -16,6 +16,7 @@ type
     constructor Create();
     destructor Destroy; override;
     procedure PreencherGrid(TblClientes: TFDQuery; APesquisa, ACampo: string);
+    procedure PreencherComboCliente(TblClientes: TFDQuery);
     procedure CarregarCampos(QryClientes: TFDQuery; FCliente: TCliente; ACodigo: Integer);
     function Inserir(QryClientes: TFDQuery; FCliente: TCliente; Transacao: TFDTransaction; out sErro: string): Boolean;
     function Alterar(QryClientes: TFDQuery; FCliente: TCliente; Transacao: TFDTransaction; ACodigo: Integer; out sErro: string): Boolean;
@@ -68,6 +69,11 @@ begin
       raise;
     end;
   end;
+end;
+
+procedure TClienteController.PreencherComboCliente(TblClientes: TFDQuery);
+begin
+  FClienteRepo.PreencherComboCliente(TblClientes);
 end;
 
 function TClienteController.Inserir(QryClientes: TFDQuery; FCliente: TCliente; Transacao: TFDTransaction; out sErro: string): Boolean;

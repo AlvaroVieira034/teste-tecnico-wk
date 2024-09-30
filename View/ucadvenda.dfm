@@ -217,6 +217,7 @@ inherited FrmCadVenda: TFrmCadVenda
         ParentShowHint = False
         ShowHint = True
         TabOrder = 0
+        OnKeyPress = EdtCodVendaKeyPress
       end
       object EdtDataVenda: TEdit
         Left = 135

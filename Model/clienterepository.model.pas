@@ -8,6 +8,7 @@ type
   TClienteRepository = class
   public
     procedure PreencherGrid(TblClientes: TFDQuery; APesquisa, ACampo: string);
+    procedure PreencherComboCliente(TblClientes: TFDQuery);
     procedure CarregarCampos(QryClientes: TFDQuery; FCliente: TCliente; ACodigo: Integer);
     function Inserir(QryClientes: TFDQuery; FCliente: TCliente; Transacao: TFDTransaction; out sErro: string): Boolean;
     function Alterar(QryClientes: TFDQuery; FCliente: TCliente; Transacao: TFDTransaction; ACodigo: Integer; out sErro: string): Boolean;
@@ -25,16 +26,25 @@ begin
   begin
     Close;
     SQL.Clear;
-    SQL.Add('select * from tab_cliente cli order by cli.des_nomecliente ');
-
-    {SQL.Add('select cli.cod_cliente,  ');
+    SQL.Add('select cli.cod_cliente,  ');
     SQL.Add('cli.des_nomecliente, ');
     SQL.Add('cli.des_cidade, ');
     SQL.Add('cli.des_uf ');
     SQL.Add('from tab_cliente cli');
     SQL.Add('where ' + ACampo + ' like :pNOME');
     SQL.Add('order by ' + ACampo);
-    ParamByName('PNOME').AsString := APesquisa;}
+    ParamByName('PNOME').AsString := APesquisa;
+    Open();
+  end;
+end;
+
+procedure TClienteRepository.PreencherComboCliente(TblClientes: TFDQuery);
+begin
+  with TblClientes do
+  begin
+    Close;
+    SQL.Clear;
+    SQL.Add('select * from tab_cliente order by des_nomecliente ');
     Open();
   end;
 end;

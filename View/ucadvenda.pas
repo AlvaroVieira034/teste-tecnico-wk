@@ -80,6 +80,7 @@ type
     procedure BtnExcluirClick(Sender: TObject);
     procedure EdtPrecoUnitExit(Sender: TObject);
     procedure EdtPrecoTotalExit(Sender: TObject);
+    procedure EdtCodVendaKeyPress(Sender: TObject; var Key: Char);
 
 
   private
@@ -104,7 +105,7 @@ type
     FVendaItens: TVendaItens;
     VendaItensController: TVendaItensController;
 
-    procedure CarregarVendas;
+    procedure CarregarVendas(ACodVenda: Integer);
     procedure InserirVendas;
     procedure InserirVendaItens;
     procedure AlterarVendas;
@@ -152,13 +153,13 @@ end;
 destructor TFrmCadVenda.Destroy;
 begin
   TransacaoVendas.Free;
-  DsVendas.Free;
-  DsClientes.Free;
-  DsProdutos.Free;
+  TblProdutos.Free;
+  TblClientes.Free;
   TblVendas.Free;
   TblVendaItens.Free;
-  TblClientes.Free;
-  TblProdutos.Free;
+  DsProdutos.Free;
+  DsClientes.Free;
+  DsVendas.Free;
   QryVendas.Free;
   QryTemp.Free;
   inherited;
@@ -235,8 +236,8 @@ procedure TFrmCadVenda.FormShow(Sender: TObject);
 begin
   inherited;
   totVenda := 0;
-  ClienteController.PreencherGrid(TblClientes, ' ' + '%', 'Nome');
-  ProdutoController.PreencherGrid(TblProdutos, ' ' + '%', 'Nome');
+  ClienteController.PreencherComboCliente(TblClientes);
+  ProdutoController.PreencherComboProduto(TblProdutos);
 
   DbGridItensPedido.Columns[0].Width := 290;
   DbGridItensPedido.Columns[1].Width := 80;
@@ -326,7 +327,7 @@ begin
     EdtCodCliente.Text := ValoresOriginais[2];
     EdtTotalVenda.Text := ValoresOriginais[3];
     EdtCodClienteExit(Sender);
-    CarregarVendas();
+    CarregarVendas(0);
   end;
   VerificaBotoes(FOperacao);
   BtnInserirItens.Enabled := False;
@@ -428,37 +429,65 @@ begin
 end;
 
 procedure TFrmCadVenda.BtnPesquisarClick(Sender: TObject);
+var LCodvenda: Integer;
 begin
   inherited;
   pesqVenda := False;
-  if not Assigned(FrmPesquisaVendas) then
-    FrmPesquisaVendas := TFrmPesquisaVendas.Create(Self);
 
-  FrmPesquisaVendas.ShowModal;
-  FrmPesquisaVendas.Free;
-  FrmPesquisaVendas := nil;
+  if TryStrToInt(EdtCodVenda.Text, LCodvenda) then
+    LCodvenda := StrToInt(EdtCodVenda.Text)
+  else
+    LCodvenda := 0;
 
-  if pesqVenda then
+  if EdtCodVenda.Text = EmptyStr then // Pesquisa através da janela de pesquisa.
   begin
-    CarregarVendas();
-    ValoresOriginais[0] := EdtCodVenda.Text;
-    ValoresOriginais[1] := EdtDataVenda.Text;
-    ValoresOriginais[2] := EdtCodCliente.Text;
-    ValoresOriginais[3] := EdtTotalVenda.Text;
+    if not Assigned(FrmPesquisaVendas) then
+      FrmPesquisaVendas := TFrmPesquisaVendas.Create(Self);
+
+    FrmPesquisaVendas.ShowModal;
+    FrmPesquisaVendas.Free;
+    FrmPesquisaVendas := nil;
+
+    if pesqVenda then
+    begin
+      CarregarVendas(0);
+      ValoresOriginais[0] := EdtCodVenda.Text;
+      ValoresOriginais[1] := EdtDataVenda.Text;
+      ValoresOriginais[2] := EdtCodCliente.Text;
+      ValoresOriginais[3] := EdtTotalVenda.Text;
+      EdtCodClienteExit(Sender);
+
+      if FOperacao = opEditar then
+        BtnAlterar.Click;
+
+      VerificaBotoes(FOperacao);
+    end;
+  end;
+
+  if LCodvenda > 0 then  // Pesquisa informando o codigo da venda.
+  begin
+    CarregarVendas(LCodvenda);
     EdtCodClienteExit(Sender);
-
-
-    FOperacao := opEditar;
-    VerificaBotoes(FOperacao);
-    BtnAlterar.Click;
   end;
 end;
 
-procedure TFrmCadVenda.CarregarVendas;
+procedure TFrmCadVenda.CarregarVendas(ACodVenda: Integer);
 begin
   MTblVendaItem.Close;
   MTblVendaItem.CreateDataSet;
+
+  if ACodVenda > 0 then
+    codigoVenda := ACodVenda;
+
   VendaController.CarregarCampos(QryVendas, FVenda, codigoVenda);
+  if QryVendas.Eof then
+  begin
+    MessageDlg('Venda não encontada!', mtInformation, [mbOK], 0);
+    LimpaCamposPedido();
+    EdtCodVenda.SetFocus;
+    Exit;
+  end;
+
   with FVenda do
   begin
     EdtCodVenda.Text := IntToStr(Cod_Venda);
@@ -680,7 +709,7 @@ begin
   BtnCancelar.Enabled := AOperacao in [opNovo, opEditar];
 
   BtnPesquisar.Enabled := AOperacao in [opInicio, opNavegar];
-  BtnLimpaCampos.Enabled := AOperacao in [opNovo, opEditar];
+  BtnLimpaCampos.Enabled := EdtCodVenda.Enabled;
 
   EdtCodVenda.Enabled := AOperacao in [opInicio, opNavegar];
   EdtDataVenda.Enabled := AOperacao in [opNovo, opEditar];
@@ -762,11 +791,24 @@ procedure TFrmCadVenda.EdtQuantidadeExit(Sender: TObject);
 var LValorItem: Double;
 begin
   inherited;
+  if (EdtQuantidade.Text = EmptyStr) or (StrToInt(EdtQuantidade.Text) = 0) then
+  begin
+    MessageDlg('Informe um valor válido para Quantidade!', mtInformation, [mbOK], 0);
+    EdtQuantidade.SetFocus;
+    Exit;
+  end;
   LValorItem := (StrToInt(EdtQuantidade.Text) * StrToFloat(EdtPrecoUnit.Text));
   EdtPrecoTotal.Text := FormatFloat('#0.00', LValorItem);
 end;
 
 procedure TFrmCadVenda.EdtCodClienteKeyPress(Sender: TObject; var Key: Char);
+begin
+  inherited;
+  if not( key in['0'..'9',#08] ) then
+    key:=#0;
+end;
+
+procedure TFrmCadVenda.EdtCodVendaKeyPress(Sender: TObject; var Key: Char);
 begin
   inherited;
   if not( key in['0'..'9',#08] ) then
@@ -789,6 +831,14 @@ end;
 procedure TFrmCadVenda.BtnSairClick(Sender: TObject);
 begin
   inherited;
+  FProduto.Free;
+  ProdutoController.Free;
+  FCliente.Free;
+  ClienteController.Free;
+  FVenda.Free;
+  VendaController.Free;
+  FVendaItens.Free;
+  VendaItensController.Free;
   Close;
 end;
 

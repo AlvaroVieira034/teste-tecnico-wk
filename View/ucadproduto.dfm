@@ -253,6 +253,7 @@ inherited FrmCadProduto: TFrmCadProduto
             FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
             FFB67E0EFFFFFFFFFFFFBD8C27B67E0EB67C09B67B08B57B08B67B08B67B08B5
             7B08B67B08B67B08B57B08B67C09B67E0EBD8C27FFFFFFFFFFFF}
+          OnClick = BtnPesquisarClick
         end
         object EdtPesquisar: TEdit
           Left = 142
@@ -270,8 +271,9 @@ inherited FrmCadProduto: TFrmCadProduto
           Height = 21
           TabOrder = 0
           Text = 'Descri'#231#227'o'
+          OnClick = CbxFiltroClick
           Items.Strings = (
-            'Codigo'
+            'C'#243'digo'
             'Descri'#231#227'o')
         end
       end

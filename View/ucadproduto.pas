@@ -45,6 +45,8 @@ type
     procedure BtnExcluirClick(Sender: TObject);
     procedure EdtPrecoUnitarioKeyPress(Sender: TObject; var Key: Char);
     procedure EdtPrecoUnitarioExit(Sender: TObject);
+    procedure CbxFiltroClick(Sender: TObject);
+    procedure BtnPesquisarClick(Sender: TObject);
 
   private
     ValoresOriginais: array of string;
@@ -156,6 +158,12 @@ begin
   ValoresOriginais[0] := EdtCodProduto.Text;
   ValoresOriginais[1] := EdtDescricao.Text;
   ValoresOriginais[2] := EdtPrecoUnitario.Text;
+end;
+
+procedure TFrmCadProduto.CbxFiltroClick(Sender: TObject);
+begin
+  inherited;
+  BtnPesquisar.Click;
 end;
 
 procedure TFrmCadProduto.Inserir;
@@ -294,6 +302,12 @@ begin
   FOperacao := opNovo;
   VerificaBotoes(FOperacao);
   LimpaCampos(FOperacao);
+end;
+
+procedure TFrmCadProduto.BtnPesquisarClick(Sender: TObject);
+begin
+  inherited;
+  PreencherGrid();
 end;
 
 procedure TFrmCadProduto.BtnAlterarClick(Sender: TObject);

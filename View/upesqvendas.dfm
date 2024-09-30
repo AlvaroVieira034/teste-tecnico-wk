@@ -26,7 +26,6 @@ object FrmPesquisaVendas: TFrmPesquisaVendas
     Align = alClient
     Caption = ' Selecione uma Venda'
     TabOrder = 0
-    ExplicitWidth = 724
     DesignSize = (
       682
       387)
@@ -86,7 +85,6 @@ object FrmPesquisaVendas: TFrmPesquisaVendas
       BevelOuter = bvNone
       ParentBackground = False
       TabOrder = 1
-      ExplicitWidth = 726
       DesignSize = (
         678
         37)
@@ -226,7 +224,6 @@ object FrmPesquisaVendas: TFrmPesquisaVendas
         Anchors = [akLeft, akTop, akRight]
         CharCase = ecUpperCase
         TabOrder = 1
-        ExplicitWidth = 332
       end
       object CbxFiltro: TComboBox
         Left = 59

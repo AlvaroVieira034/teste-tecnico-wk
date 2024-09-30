@@ -7,7 +7,8 @@ uses produto.model, conexao.model, System.SysUtils, FireDAC.Comp.Client, FireDAC
 type
   TProdutoRepository = class
   public
-    procedure PreencherGrid(TblProdutos: TFDQuery; sPesquisa, sCampo: string);
+    procedure PreencherGrid(TblProdutos: TFDQuery; APesquisa, ACampo: string);
+    procedure PreencherComboProduto(TblProdutos: TFDQuery);
     procedure CarregarCampos(QryProdutos: TFDQuery; FProduto: TProduto; iCodigo: Integer);
     function Inserir(QryProdutos: TFDQuery; FProduto: TProduto; Transacao: TFDTransaction; out sErro: string): Boolean;
     function Alterar(QryProdutos: TFDQuery; FProduto: TProduto; Transacao: TFDTransaction; iCodigo: Integer; out sErro: string): Boolean;
@@ -21,21 +22,30 @@ implementation
 { TProdutoRepository }
 
 
-procedure TProdutoRepository.PreencherGrid(TblProdutos: TFDQuery; sPesquisa, sCampo: string);
+procedure TProdutoRepository.PreencherGrid(TblProdutos: TFDQuery; APesquisa, ACampo: string);
+begin
+  with TblProdutos do
+  begin
+    Close;
+    SQL.Clear;
+    SQL.Add('select prd.cod_produto, ');
+    SQL.Add('prd.des_descricao, ');
+    SQL.Add('prd.val_preco ');
+    SQL.Add('from tab_produto prd');
+    SQL.Add('where ' + ACampo + ' like :pNOME');
+    SQL.Add('order by ' + ACampo);
+    ParamByName('PNOME').AsString := APesquisa;
+    Open();
+  end;
+end;
+
+procedure TProdutoRepository.PreencherComboProduto(TblProdutos: TFDQuery);
 begin
   with TblProdutos do
   begin
     Close;
     SQL.Clear;
     SQL.Add('select * from tab_produto prd order by prd.des_descricao ');
-
-    {SQL.Add('select prd.cod_produto, ');
-    SQL.Add('prd.des_descricao, ');
-    SQL.Add('prd.val_preco ');
-    SQL.Add('from tab_produto prd');
-    SQL.Add('where ' + sCampo + ' like :pNOME');
-    SQL.Add('order by ' + sCampo);
-    ParamByName('PNOME').AsString := sPesquisa;}
     Open();
   end;
 end;
