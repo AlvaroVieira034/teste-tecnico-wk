@@ -210,8 +210,12 @@ inherited FrmCadVenda: TFrmCadVenda
         Top = 26
         Width = 74
         Height = 21
+        Hint = 
+          'Digite o c'#243'digo da venda ou clique no bot'#227'o pesquisar para abrir' +
+          ' a janela de pesquisa.'
         Alignment = taRightJustify
-        Enabled = False
+        ParentShowHint = False
+        ShowHint = True
         TabOrder = 0
       end
       object EdtDataVenda: TEdit

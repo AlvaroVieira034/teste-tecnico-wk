@@ -10,8 +10,8 @@ type
 
   public
     procedure Carregar(QryVendaItens: TFDQuery; FVendaItens: TVendaItens; ACodigo: Integer);
-    function Inserir(QryVendaItens: TFDQuery; FVendaItens: TVendaItens; out sErro: string): Boolean;
-    function Excluir(QryVendaItens: TFDQuery; Transacao: TFDTransaction; ACodigo: Integer; out sErro: string): Boolean;
+    function Inserir(QryVendaItens: TFDQuery; FVendaItens: TVendaItens; TransacaoItens: TFDTransaction; out sErro: string): Boolean;
+    function Excluir(QryVendaItens: TFDQuery; TransacaoItens: TFDTransaction; ACodigo: Integer; out sErro: string): Boolean;
 
   end;
 
@@ -41,7 +41,7 @@ begin
   end;
 end;
 
-function TVendaItensRepository.Inserir(QryVendaItens: TFDQuery; FVendaItens: TVendaItens; out sErro: string): Boolean;
+function TVendaItensRepository.Inserir(QryVendaItens: TFDQuery; FVendaItens: TVendaItens; TransacaoItens: TFDTransaction; out sErro: string): Boolean;
 begin
   with QryVendaItens, FVendaItens do
   begin
@@ -65,22 +65,29 @@ begin
     ParamByName('VAL_QUANTIDADE').AsInteger := Val_Quantidade;
     ParamByName('VAL_TOTALITEM').AsFloat := Val_TotalItem;
 
+    // Inicia Transação
+    if not TransacaoItens.Connection.Connected then
+      TransacaoItens.Connection.Open();
+
     try
       Prepared := True;
+      TransacaoItens.StartTransaction;
       ExecSQL;
+      TransacaoItens.Commit;
       Result := True;
     except
       on E: Exception do
       begin
-        Result := False;
+        TransacaoItens.Rollback;
         sErro := 'Ocorreu um erro ao inserir um novo item da venda!' + sLineBreak + E.Message;
+        Result := False;
         raise;
       end;
     end;
   end;
 end;
 
-function TVendaItensRepository.Excluir(QryVendaItens: TFDQuery; Transacao: TFDTransaction; ACodigo: Integer; out sErro: string): Boolean;
+function TVendaItensRepository.Excluir(QryVendaItens: TFDQuery; TransacaoItens: TFDTransaction; ACodigo: Integer; out sErro: string): Boolean;
 begin
   with QryVendaItens do
   begin
@@ -89,19 +96,25 @@ begin
     SQL.Text := 'delete from tab_venda_item where cod_venda = :cod_venda';
     ParamByName('COD_VENDA').AsInteger := ACodigo;
 
+    // Inicia Transação
+    if not TransacaoItens.Connection.Connected then
+      TransacaoItens.Connection.Open();
+
     try
       Prepared := True;
-      ExecSQL();
+      TransacaoItens.StartTransaction;
+      ExecSQL;
+      TransacaoItens.Commit;
       Result := True;
     except on E: Exception do
       begin
-        sErro := 'Ocorreu um erro ao excluir a venda !' + sLineBreak + E.Message;
+        TransacaoItens.Rollback;
+        sErro := 'Ocorreu um erro ao excluir os itens da venda !' + sLineBreak + E.Message;
         Result := False;
         raise;
       end;
     end;
   end;
-
 end;
 
 end.

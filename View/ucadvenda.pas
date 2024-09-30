@@ -95,7 +95,6 @@ type
     DsClientes: TDataSource;
     DsVendas: TDataSource;
     TransacaoVendas: TFDTransaction;
-    //TransacaoVendaItens: TFDTransaction;
     FProduto: TProduto;
     ProdutoController: TProdutoController;
     FCliente: TCliente;
@@ -139,7 +138,6 @@ constructor TFrmCadVenda.Create(AOwner: TComponent);
 begin
   inherited;
   TransacaoVendas := TFDTransaction.Create(nil);
-  //TransacaoVendaItens := TFDTransaction.Create(nil);
   TblProdutos := TFDQuery.Create(nil);
   TblClientes := TFDQuery.Create(nil);
   TblVendas := TFDQuery.Create(nil);
@@ -154,7 +152,6 @@ end;
 destructor TFrmCadVenda.Destroy;
 begin
   TransacaoVendas.Free;
-  //TransacaoVendaItens.Free;
   DsVendas.Free;
   DsClientes.Free;
   DsProdutos.Free;
@@ -188,7 +185,7 @@ begin
     QryTemp := TConexao.GetInstance.Connection.CriarQuery;
 
     QryVendas.Transaction := TransacaoVendas;
-    //QryVendaItens.Transaction := TransacaoVendaItens;
+    QryVendaItens.Transaction := TransacaoVendas;
 
     // Cria DataSource
     DsClientes := TConexao.GetInstance.Connection.CriarDataSource;
@@ -449,6 +446,8 @@ begin
     ValoresOriginais[2] := EdtCodCliente.Text;
     ValoresOriginais[3] := EdtTotalVenda.Text;
     EdtCodClienteExit(Sender);
+
+
     FOperacao := opEditar;
     VerificaBotoes(FOperacao);
     BtnAlterar.Click;
@@ -496,7 +495,6 @@ begin
     Cod_Cliente := StrToInt(EdtCodCliente.Text);
     Val_Venda := StrToFloat(
     StringReplace(StringReplace(EdtTotalVenda.Text, '.', '', [rfReplaceAll]), ',', FormatSettings.DecimalSeparator, [rfReplaceAll]));
-    //Val_Venda := StrToFloat(EdtTotalVenda.Text);
 
     if VendaController.Inserir(QryVendas, FVenda, TransacaoVendas, sErro) = false then
       raise Exception.Create(sErro);
@@ -520,7 +518,7 @@ begin
       Val_Quantidade := MTblVendaItemVAL_QUANTIDADE.AsInteger;
       Val_TotalItem := MTblVendaItemVAL_TOTALITEM.AsFloat;
 
-      if VendaItensController.Inserir(QryVendaItens, FVendaItens, sErro) = false then
+      if VendaItensController.Inserir(QryVendaItens, FVendaItens, TransacaoVendas, sErro) = false then
         raise Exception.Create(sErro);
     end;
     MTblVendaItem.Next;
@@ -684,6 +682,7 @@ begin
   BtnPesquisar.Enabled := AOperacao in [opInicio, opNavegar];
   BtnLimpaCampos.Enabled := AOperacao in [opNovo, opEditar];
 
+  EdtCodVenda.Enabled := AOperacao in [opInicio, opNavegar];
   EdtDataVenda.Enabled := AOperacao in [opNovo, opEditar];
   EdtCodCliente.Enabled := AOperacao in [opNovo, opEditar];
   LcbxNomeCliente.Enabled := AOperacao in [opNovo, opEditar];

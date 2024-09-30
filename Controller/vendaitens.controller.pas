@@ -16,9 +16,8 @@ type
     constructor Create();
     destructor Destroy; override;
     function Carregar(QryVendasItens: TFDQuery; FVendaItens: TVendaItens; ACodigo: Integer): Boolean;
-    function Inserir(QryVendasItens: TFDQuery; FVendaItens: TVendaItens; var sErro: string): Boolean;
-    function Excluir(QryVendasItens: TFDQuery; Transacao: TFDTransaction; ACodigo: Integer; var sErro: string): Boolean;
-    function ValidarDados(const ACodProduto, AQuantidade, APrecoUnitario, ATotalItem: string; out AErro: TCampoInvalido): Boolean;
+    function Inserir(QryVendasItens: TFDQuery; FVendaItens: TVendaItens; TransacaoItens: TFDTransaction; var sErro: string): Boolean;
+    function Excluir(QryVendasItens: TFDQuery; TransacaoItens: TFDTransaction; ACodigo: Integer; var sErro: string): Boolean;
 
   end;
 
@@ -53,19 +52,15 @@ begin
   end;
 end;
 
-function TVendaItensController.Inserir(QryVendasItens: TFDQuery; FVendaItens: TVendaItens; var sErro: string): Boolean;
+function TVendaItensController.Inserir(QryVendasItens: TFDQuery; FVendaItens: TVendaItens; TransacaoItens: TFDTransaction; var sErro: string): Boolean;
 begin
-  Result := FVendaItensRepo.Inserir(QryVendasItens, FVendaItens, sErro);
+  Result := FVendaItensRepo.Inserir(QryVendasItens, FVendaItens, TransacaoItens, sErro);
 end;
 
-function TVendaItensController.Excluir(QryVendasItens: TFDQuery; Transacao: TFDTransaction; ACodigo: Integer; var sErro: string): Boolean;
+function TVendaItensController.Excluir(QryVendasItens: TFDQuery; TransacaoItens: TFDTransaction; ACodigo: Integer; var sErro: string): Boolean;
 begin
-  Result := FVendaItensRepo.Excluir(QryVendasItens, Transacao,  ACodigo,  sErro);
+  Result := FVendaItensRepo.Excluir(QryVendasItens, TransacaoItens,  ACodigo,  sErro);
 end;
 
-function TVendaItensController.ValidarDados(const ACodProduto, AQuantidade, APrecoUnitario, ATotalItem: string; out AErro: TCampoInvalido): Boolean;
-begin
-
-end;
 
 end.
