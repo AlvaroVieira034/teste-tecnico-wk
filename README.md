@@ -22,7 +22,7 @@
 
 ## Introdução
 
-Este projeto é uma aplicação Delphi, desenvolvida como forma de desafio técnico para o processo seletivo para a vaga de programador Delphi. A aplicação registra pedidos e seus respectivos produtos, possibilitando a inclusão, alteração e exclusão de pedidos e seus respectivos itens, além da pesquisa pelo código da venda ou através de uma interface de pequisa, permitindo a navegação entre registros, exibindo ou atualizando os dados armazenados no banco de dados.
+Este projeto é uma aplicação Delphi, desenvolvida como forma de desafio técnico para o processo seletivo para a vaga de programador Delphi. A aplicação registra os pedidos, possibilitando a inclusão, alteração e exclusão de pedidos e seus respectivos itens, além da pesquisa pelo código da venda ou através de uma interface de pequisa, permitindo a navegação entre registros, exibindo ou atualizando os dados armazenados no banco de dados.
 
 ![image](https://github.com/user-attachments/assets/993bd200-3ada-4369-8027-2df6483e16e2)
 
@@ -62,7 +62,22 @@ Para selecionar um registro da grade, basta dar um duplo click no registro escol
 
 - Botão Inserir: Ao clicar no botão "**Inserir**", será liberada a área de dados do produto para a digitação das informações para a inclusão de um novo produto. Nesse momento, os botoes "**Gravar**" e "**Cancelar**" ficam habilitados e os demais botões ficam desabilitados, ficando para o usuário as opções de gravar o produto ou cancelar a inclusão.
 
-- Botão Alterar: Após selecionar um registo na grade, fica habilitado o botão "**Alterar**"Ao clicar no botão "**Inserir**", será liberada a área de dados do produto para a digitação das informações para a inclusão de um novo produto. Nesse momento, os botoes "**Gravar**" e "**Cancelar**" ficam habilitados e os demais botões ficam desabilitados, ficando para o usuário as opções de gravar o produto ou cancelar a inclusão.
+- Botão Alterar: Após selecionar um registo na grade, fica habilitado o botão "**Alterar**". Ao clicar no botão "**Alterar**", será liberada a área de dados do produto para a alteração das informações referentes ao produto. Nesse momento, os botoes "**Gravar**" e "**Cancelar**" ficam habilitados e os demais botões ficam desabilitados, ficando para o usuário as opções de gravar o produto ou cancelar a alteração.
+
+- Botão Excluir: Após selecionar um registo na grade, fica habilitado o botão "**Excluir**". Ao clicar no botão "**Excluir**", será feita uma pergunta ao usuario se ele deseja excluir o registro selecionado. Caso o usuário responda "Sim", o registro será excluído definitivamente do cadastro de produtos.
+
+- Botão Sair: Fecha a tela do cadastro de produtos e retorna ao menu inicial.
+
+  ### Cadastro de Vendas
+
+![image](https://github.com/user-attachments/assets/3d338fd6-4e9b-4538-8767-4d14d9be63cf)
+
+Na interface principal, ao clicar no botão **"Vendas"**, será exibida a interface de vendas contendo os dados da venda e uma grade para os produtos cadastrados, além dos botões de ação (Incluir, Alterar, Excluir, Gravar, Cancelar e Sair), localizados acima da tela.
+
+Para acessar uma venda cadastrada o usuário pode informar o codigo da venda no campo apropriado e em seguida clicar no botão "**Pesquisar**" ![image](https://github.com/user-attachments/assets/8c758810-f359-4726-9c42-725121ab0de5)
+
+
+![image](https://github.com/user-attachments/assets/55b18375-874f-4112-8bf1-13db6bfcb70d)
 
 
 Ao Informar o cep a pesquisar e clicar no botão "Pesquisar", será preenchido automaticamente os campos relacionados ao endereço, ficando disponível para o usuário efetuar qualquer alteração nas informações obtidas atraves da API do ViaCep. Nesse momento é habilitado o botão "Inserir" e o botão "Cancelar", ficando desabilidado o grid e os demais botões. Caso deseje inserir o registro, basta clicar no botão "Inserir" que o mesmo será adicionado a base de dados existente, caso contrário, clicar no botão "cancelar" que a interface voltará ao estado inicial dela.
