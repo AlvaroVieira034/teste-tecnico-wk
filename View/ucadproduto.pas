@@ -47,6 +47,8 @@ type
     procedure EdtPrecoUnitarioExit(Sender: TObject);
     procedure CbxFiltroClick(Sender: TObject);
     procedure BtnPesquisarClick(Sender: TObject);
+    procedure DBGridProdutosKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
 
   private
     ValoresOriginais: array of string;
@@ -294,6 +296,19 @@ begin
   FOperacao := opNavegar;
   CarregarCampos;
   VerificaBotoes(FOperacao);
+end;
+
+procedure TFrmCadProduto.DBGridProdutosKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  inherited;
+  if Key = VK_RETURN then
+  begin
+    CarregarCampos();
+    VerificaBotoes(FOperacao);
+    FOperacao := opEditar;
+    BtnAlterar.Click;
+    Key := 0;
+  end;
 end;
 
 procedure TFrmCadProduto.BtnInserirClick(Sender: TObject);

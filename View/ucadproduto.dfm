@@ -1,7 +1,7 @@
 inherited FrmCadProduto: TFrmCadProduto
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
-  Caption = 'Cadastro de Produto'
+  Caption = 'Cadastro de Produtos'
   ClientHeight = 460
   ClientWidth = 668
   Position = poMainFormCenter
@@ -170,6 +170,7 @@ inherited FrmCadProduto: TFrmCadProduto
         TitleFont.Name = 'Tahoma'
         TitleFont.Style = []
         OnDblClick = DBGridProdutosDblClick
+        OnKeyDown = DBGridProdutosKeyDown
         Columns = <
           item
             Expanded = False
