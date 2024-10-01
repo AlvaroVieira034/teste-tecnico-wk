@@ -58,7 +58,7 @@ A interface principal da aplicação é apresentada contendo os botões de opç�
 
 Na interface principal, ao clicar no botão **"Produtos"**, será exibida a interface de produtos, contendo os dados do produto, uma grade contendo todos os produtos cadastrados, uma área para pesquisa no grid (podendo ser alterada a forma de pesquisa por descrição ou codigo do produto), além dos botões de ação (Incluir, Alterar, Excluir, Gravar, Cancelar e Sair), localizados acima da tela.
 
-Para selecionar um registro da grade, basta dar um duplo click no registro escolhido, que todas as informações do produtos serão mostradas na área destinada aos dados do produto. Pode-se também, navegar pela grade usando as setas e ao acionar a tecla <Enter> o registro será exibido na área de dados do produto, ja em estado de edição.
+Para selecionar um registro da grade, basta dar um duplo click no registro escolhido, que todas as informações do produtos serão mostradas na área destinada aos dados do produto. Pode-se também, navegar pela grade usando as setas e ao acionar a tecla *Enter* o registro será exibido na área de dados do produto, ja em estado de edição.
 
 - Botão Inserir: Ao clicar no botão "**Inserir**", será liberada a área de dados do produto para a digitação das informações para a inclusão de um novo produto. Nesse momento, os botoes "**Gravar**" e "**Cancelar**" ficam habilitados e os demais botões ficam desabilitados, ficando para o usuário as opções de gravar o produto ou cancelar a inclusão.
 
@@ -82,34 +82,25 @@ Caso o usuário deseje fazer uma pesquisa de todas as vendas cadastradas, basta 
 
 ![image](https://github.com/user-attachments/assets/0a6eea29-7b8a-425a-8a85-51cd3a2b55a0)
 
+Para selecionar um registro, o usuário pode clicar no botão "**Selecionar**" ![image](https://github.com/user-attachments/assets/3dc61588-fc06-4bbd-9b62-bff34c2e0605), pode dar um duplo click no registro desejado ou navegar pelo grid usando as setas e acionar a tecla *Enter* para selecionar um registro, nesse caso, o resgistro será exibido, já estando em modo de edição. A pesquisa pode ser refinada, escolhendo o filtro para a pesquisa e informando um valor para pesquisa, valor esse que pode ser parte da informação ou a informação completa.
 
-Para alterar as informações, clicar no botão "Alterar" e realizar as alterações necessárias. Após efetuar as alterações clicar no botão "Gravar" para que as alterações sejam persistidas no banco de dados, caso contrário, clicar no botão "Cancelar" que as alterações serão desfeitas e a interface volta ao estado inicial dela.
+Os botões de ação seguem o mesmo comportamento dos botões de ação da tela de produtos explanados anteriormente.
 
-A alteração de registros, pode ser feita também digitando o CEP no campo de pesquisa de CEP.
+Para a inclusão de vendas, seguir os passos abaixo:
 
-![image](https://github.com/user-attachments/assets/23b07c29-6fb7-4d9c-8c37-9f3557902047)
+Clicar no botão ![image](https://github.com/user-attachments/assets/939ef601-88ae-4e08-add4-b157566b61b6) para liberar a digitação dos dados da venda.
 
-Neste caso, será informado ao usuário que foi encontrado um CEP na base de dados e solicitando que efetue a atualização (com base nas informações obtidas pela API ViaCep). Caso o usuário responda sim, serão preenchidos novamente os campos relacionados ao endereço, caso contrario, serão exibidos os campos que estão na base de dados.
-A partir desse momento, a rotina permanece igual a anteriormente mencionada, permitindo o usuario alterar ou excluir o registro pesquisado.
+![image](https://github.com/user-attachments/assets/8a14817a-8e89-45b4-a435-61ad0b6a9209)
 
-### Pesquisa por Endereço
+Após preencher os dados da venda, clicar o botão ![image](https://github.com/user-attachments/assets/48ac54aa-5f4c-49ac-8866-b9cf5517c119) para liberar a inclusão dos itens do produto.
 
-Para que possa ser feita a pesquisa pelo endereço, primeiro precisa alterar a opção de pesquisa para "Endereço". Nesse momento serão exibidos os campos necessários para efetuar a pesquisa.
+Escolha o produto, informe a quantidade, o preço unitário (caso exista valor informado no cadastro para o produto escolhido, o campo "*Preço Unitário**" será preenchido automaticamente, podendo o mesmo ser alterado de acordo com o desejo do usuário) e o preço total do item.
 
-![image](https://github.com/user-attachments/assets/c829d807-5384-4344-a53f-19c828e51dfc)
+Clique no botão ![image](https://github.com/user-attachments/assets/c4002535-cae1-478a-9aa1-4e4211ae5f50) para adiconar o produto ao pedido e o mesmo ir para a grade de produtos cadastrados.
 
-Todos os campos para pesquisa por endereço completo são de preenchimento obrigatório. Após preecher o endereço completo, basta clicar no botão "Pesquisar" que será feito o mesmo procedimento como na consulta por cep. No caso de pesquisa por endereço, é possivel quel o mesmo endereço possa existir com CEPs diferentes (logradouros com o mesmo nome em bairros distintos ou logradouro com varios CEPs), nesse caso, será exibida uma mensagem ao usuário informando que existe mais de um CEP para o endereço informado e solicitando se deseja visualiza-los. Caso o usuário escolha "Sim", será exibido uma nova janela mostrando todos os CEPs encontrados para o endereço informado.
+Caso deseje excluir um produto cadastrado, clique no botão ![image](https://github.com/user-attachments/assets/e918d7fb-2d1e-4518-99aa-4782c0abf75e) para exluir o produto da grade de produtos cadastrados.
 
-![image](https://github.com/user-attachments/assets/160ccd29-9a80-4e2a-abac-c4ae0fe2f674)
-
-Basta o usuário clicar no botão "Selecionar" ou dar um duplo click no registro escolhido no grid que serão preenchidas as informações na interface principal da aplicação.
-
-![image](https://github.com/user-attachments/assets/fb6dee87-faf0-4b3c-82e9-06ecc611d993)
-
-O mesmo procedimento de pesquisar um CEP que já existe na base de dados e que permite atualizar o endereço com as informações obtidas pelo webservice do ViaCep, ocorre também com a pesquisa por endereço completo.
-
-![image](https://github.com/user-attachments/assets/31efa942-8a25-412b-a761-d6be479f15c8)
-
+Após incluir os itens desejados, clicar no botão ![image](https://github.com/user-attachments/assets/8b1ad9cb-8a03-4e03-841a-374dac0c6b47) para realizar a inclusão da venda.
 
 
 ## Padrões Aplicados
