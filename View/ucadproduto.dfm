@@ -4,8 +4,10 @@ inherited FrmCadProduto: TFrmCadProduto
   Caption = 'Cadastro de Produtos'
   ClientHeight = 460
   ClientWidth = 668
+  KeyPreview = True
   Position = poMainFormCenter
   OnCreate = FormCreate
+  OnKeyDown = FormKeyDown
   OnShow = FormShow
   ExplicitWidth = 674
   ExplicitHeight = 489

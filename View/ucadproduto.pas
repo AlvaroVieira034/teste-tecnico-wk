@@ -47,8 +47,8 @@ type
     procedure EdtPrecoUnitarioExit(Sender: TObject);
     procedure CbxFiltroClick(Sender: TObject);
     procedure BtnPesquisarClick(Sender: TObject);
-    procedure DBGridProdutosKeyDown(Sender: TObject; var Key: Word;
-      Shift: TShiftState);
+    procedure DBGridProdutosKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 
   private
     ValoresOriginais: array of string;
@@ -206,20 +206,9 @@ begin
   inherited;
   if TryStrToFloat(EdtPrecoUnitario.Text, LValor) then
     EdtPrecoUnitario.Text := FormatFloat('#,###,##0.00', LValor)
-  else
-  begin
-    ShowMessage('Valor inválido!');
-    EdtPrecoUnitario.SetFocus;
-  end;
+ 
 end;
 
-procedure TFrmCadProduto.EdtPrecoUnitarioKeyPress(Sender: TObject;
-  var Key: Char);
-begin
-  inherited;
-  if not (key in ['0'..'9', ',', #08]) then
-    key := #0;
-end;
 
 procedure TFrmCadProduto.Excluir;
 var sErro : String;
@@ -412,6 +401,20 @@ begin
   DsProdutos := TConexao.GetInstance.Connection.CriarDataSource;
   DsProdutos.DataSet := TblProdutos;
   DBGridProdutos.DataSource := DsProdutos;
+end;
+
+procedure TFrmCadProduto.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  inherited;
+  if Key = VK_RETURN then
+    perform(WM_NEXTDLGCTL,0,0)
+end;
+
+procedure TFrmCadProduto.EdtPrecoUnitarioKeyPress(Sender: TObject; var Key: Char);
+begin
+  inherited;
+  if not (key in ['0'..'9', ',', #08]) then
+    key := #0;
 end;
 
 procedure TFrmCadProduto.BtnSairClick(Sender: TObject);

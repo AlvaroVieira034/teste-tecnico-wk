@@ -90,15 +90,9 @@ begin
     ParamByName('COD_CLIENTE').AsInteger := Cod_Cliente;
     ParamByName('VAL_VENDA').AsFloat := Val_Venda;
 
-    // Inicia Transação
-    if not Transacao.Connection.Connected then
-      Transacao.Connection.Open();
-
     try
       Prepared := True;
-      Transacao.StartTransaction;
       ExecSQL;
-      Transacao.Commit;
       Result := True;
 
       QryVendas.Close;
@@ -109,7 +103,6 @@ begin
     except
       on E: Exception do
       begin
-        Transacao.Rollback;
         sErro := 'Ocorreu um erro ao inserir uma nova venda!' + sLineBreak + E.Message;
         Result := False;
         raise;
@@ -136,19 +129,12 @@ begin
     ParamByName('VAL_VENDA').AsFloat := Val_Venda;
     ParamByName('COD_VENDA').AsInteger := ACodigo;
 
-    // Inicia Transação
-    if not Transacao.Connection.Connected then
-      Transacao.Connection.Open();
-
     try
       Prepared := True;
-      Transacao.StartTransaction;
       ExecSQL;
-      Transacao.Commit;
       Result := True;
     except on E: Exception do
       begin
-        Transacao.Rollback;
         sErro := 'Ocorreu um erro ao alterar os dados da venda!' + sLineBreak + E.Message;
         Result := False;
         raise;

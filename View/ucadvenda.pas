@@ -15,7 +15,7 @@ uses
 {$ENDREGION}
 
 type
-  TOperacao = (opInicio, opNovo, opEditar, opNavegar);
+  TOperacao = (opInicio, opNovo, opEditar, opNavegar, opErro);
   TFrmCadVenda = class(TFrmCadastroPadrao)
 
 {$REGION 'Componentes'}
@@ -81,6 +81,8 @@ type
     procedure EdtPrecoUnitExit(Sender: TObject);
     procedure EdtPrecoTotalExit(Sender: TObject);
     procedure EdtCodVendaKeyPress(Sender: TObject; var Key: Char);
+    procedure DbGridItensPedidoKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 
 
   private
@@ -106,8 +108,10 @@ type
     VendaItensController: TVendaItensController;
 
     procedure CarregarVendas(ACodVenda: Integer);
+    procedure Inserir;
     procedure InserirVendas;
     procedure InserirVendaItens;
+    procedure Alterar;
     procedure AlterarVendas;
     procedure AlterarVendaItens;
     procedure ExcluirVendas;
@@ -128,8 +132,9 @@ type
 
 var
   FrmCadVenda: TFrmCadVenda;
-  totVenda: Double;
+  totVenda, totVendaAnt: Double;
   idItem: Integer;
+  alterouGrid: Boolean;
 
 implementation
 
@@ -148,6 +153,27 @@ begin
   DsVendas := TDataSource.Create(nil);
   QryVendas := TFDQuery.Create(nil);
   QryTemp := TFDQuery.Create(nil);
+end;
+
+procedure TFrmCadVenda.DbGridItensPedidoKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  inherited;
+  if Key = VK_RETURN then
+  begin
+    LCbxProdutos.KeyValue := MTblVendaItemCOD_PRODUTO.AsInteger;
+    EdtQuantidade.Text := IntToStr(MTblVendaItemVAL_QUANTIDADE.AsInteger);
+    EdtPrecoUnit.Text := FloatToStr(MTblVendaItemVAL_PRECOUNITARIO.AsFloat);
+    EdtPrecoTotal.Text := FloatToStr(MTblVendaItemVAL_TOTALITEM.AsFloat);
+    alterouGrid := True;
+    idItem := MTblVendaItemID_VENDA.AsInteger;
+    totVendaAnt := MTblVendaItemVAL_TOTALITEM.AsFloat;
+    Key := 0;
+  end;
+
+  if Key = VK_DELETE then
+  begin
+   BtnDelItemGridClick(Sender);
+  end;
 end;
 
 destructor TFrmCadVenda.Destroy;
@@ -232,6 +258,13 @@ begin
   end;
 end;
 
+procedure TFrmCadVenda.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  inherited;
+  if Key = VK_RETURN then
+    perform(WM_NEXTDLGCTL,0,0)
+end;
+
 procedure TFrmCadVenda.FormShow(Sender: TObject);
 begin
   inherited;
@@ -244,6 +277,114 @@ begin
   DbGridItensPedido.Columns[2].Width := 85;
   DbGridItensPedido.Columns[3].Width := 85;
   VerificaBotoes(FOperacao);
+end;
+
+procedure TFrmCadVenda.Inserir;
+var sErro: string;
+begin
+  try
+    if not TransacaoVendas.Connection.Connected then
+      TransacaoVendas.Connection.Open();
+
+    TransacaoVendas.StartTransaction;
+    try
+      InserirVendas();
+      InserirVendaItens();
+      TransacaoVendas.Commit;
+      EdtCodVenda.Text := IntToStr(codigoVenda);
+      MessageDlg('Venda inserida com sucesso!', mtInformation, [mbOK],0);
+    except
+      on E: Exception do
+      begin
+        TransacaoVendas.Rollback;
+        LimpaCamposItens();
+        LimpaCamposPedido();
+        MTblVendaItem.Close;
+        FOperacao := opErro;
+        VerificaBotoes(FOperacao);
+        raise Exception.Create('Erro ao inserir a venda e/ou os itens: ' + #13 + E.Message);
+      end;
+    end;
+  except
+    on E: Exception do
+    begin
+      MessageDlg('Falha ao gravar a venda: ' + E.Message, mtError, [mbOK], 0);
+    end;
+  end;
+end;
+
+procedure TFrmCadVenda.InserirVendas;
+var sErro: string;
+begin
+  with FVenda do
+  begin
+    Dta_Venda := StrToDate(EdtDataVenda.Text);
+    Cod_Cliente := StrToInt(EdtCodCliente.Text);
+    Val_Venda := StrToFloat(
+    StringReplace(StringReplace(EdtTotalVenda.Text, '.', '', [rfReplaceAll]), ',', FormatSettings.DecimalSeparator, [rfReplaceAll]));
+
+    if VendaController.Inserir(QryVendas, FVenda, TransacaoVendas, sErro) = false then
+      raise Exception.Create(sErro);
+
+    codigoVenda := FVenda.Cod_Venda;
+  end;
+end;
+
+procedure TFrmCadVenda.InserirVendaItens;
+var sErro : string;
+begin
+  MTblVendaItem.First;
+  while not MTblVendaItem.eof do
+  begin
+    with FVendaItens do
+    begin
+      Cod_Venda := FVenda.Cod_Venda;
+      Cod_Produto := MTblVendaItemCOD_PRODUTO.AsInteger;
+      Des_Descricao := MTblVendaItemDES_DESCRICAO.AsString;
+      Val_PrecoUnitario := MTblVendaItemVAL_PRECOUNITARIO.AsFloat;
+      Val_Quantidade := MTblVendaItemVAL_QUANTIDADE.AsInteger;
+      Val_TotalItem := MTblVendaItemVAL_TOTALITEM.AsFloat;
+
+      if VendaItensController.Inserir(QryVendaItens, FVendaItens, TransacaoVendas, sErro) = false then
+        raise Exception.Create(sErro);
+    end;
+    MTblVendaItem.Next;
+  end;
+end;
+
+procedure TFrmCadVenda.Alterar;
+var sErro: string;
+begin
+  try
+    if not TransacaoVendas.Connection.Connected then
+      TransacaoVendas.Connection.Open();
+
+    TransacaoVendas.StartTransaction;
+    try
+      AlterarVendaItens();
+      AlterarVendas();
+      TransacaoVendas.Commit;
+      EdtCodVenda.Text := IntToStr(codigoVenda);
+      MessageDlg('Venda alterada com sucesso!', mtInformation, [mbOK],0);
+    except
+      on E: Exception do
+      begin
+        TransacaoVendas.Rollback;
+        LimpaCamposItens();
+        LimpaCamposPedido();
+        MTblVendaItem.Close;
+        FOperacao := opErro;
+        VerificaBotoes(FOperacao);
+        raise Exception.Create('Erro ao inserir a venda e/ou os itens: ' + #13 + E.Message);
+      end;
+    end;
+  except
+    on E: Exception do
+    begin
+      MessageDlg('Falha ao gravar a venda: ' + E.Message, mtError, [mbOK], 0);
+    end;
+  end;
+
 end;
 
 procedure TFrmCadVenda.AlterarVendas;
@@ -346,7 +487,7 @@ begin
     MTblVendaItem.ApplyUpdates(0);
     if totVenda < 0 then
       totVenda := 0;
-      
+
     EdtTotalVenda.Text := FormatFloat('######0.00', totVenda);
   end;
 end;
@@ -377,20 +518,18 @@ begin
 
   if FOperacao = opNovo then
   begin
-    InserirVendas();
-    InserirVendaItens();
-    EdtCodVenda.Text := IntToStr(codigoVenda);
-    MessageDlg('Venda inserida com sucesso!', mtInformation, [mbOK],0);
+    Inserir();
+    if FOperacao = opErro then
+      FOperacao := opInicio
+    else
+      FOperacao := opNavegar;
   end;
 
   if FOperacao = opEditar then
   begin
-    AlterarVendaItens();
-    AlterarVendas();
-    MessageDlg('Venda alterada com sucesso!', mtInformation, [mbOK],0);
+    Alterar();
+    FOperacao := opNavegar;
   end;
-
-  FOperacao := opNavegar;
   VerificaBotoes(FOperacao);
   GrbGrid.Enabled:= False;
   BtnInserirItens.Enabled := False;
@@ -426,6 +565,7 @@ procedure TFrmCadVenda.BtnLimpaCamposClick(Sender: TObject);
 begin
   inherited;
   LimpaCamposPedido();
+  MTblVendaItem.Close;
 end;
 
 procedure TFrmCadVenda.BtnPesquisarClick(Sender: TObject);
@@ -468,6 +608,8 @@ begin
   begin
     CarregarVendas(LCodvenda);
     EdtCodClienteExit(Sender);
+    FOperacao := opNavegar;
+    VerificaBotoes(FOperacao);
   end;
 end;
 
@@ -512,45 +654,6 @@ begin
       MTblVendaItem.Post;
       QryVendaItens.Next;
     end;
-  end;
-end;
-
-procedure TFrmCadVenda.InserirVendas;
-var sErro: string;
-begin
-  with FVenda do
-  begin
-    Dta_Venda := StrToDate(EdtDataVenda.Text);
-    Cod_Cliente := StrToInt(EdtCodCliente.Text);
-    Val_Venda := StrToFloat(
-    StringReplace(StringReplace(EdtTotalVenda.Text, '.', '', [rfReplaceAll]), ',', FormatSettings.DecimalSeparator, [rfReplaceAll]));
-
-    if VendaController.Inserir(QryVendas, FVenda, TransacaoVendas, sErro) = false then
-      raise Exception.Create(sErro);
-
-    codigoVenda := FVenda.Cod_Venda;
-  end;
-end;
-
-procedure TFrmCadVenda.InserirVendaItens;
-var sErro : string;
-begin
-  MTblVendaItem.First;
-  while not MTblVendaItem.eof do
-  begin
-    with FVendaItens do
-    begin
-      Cod_Venda := FVenda.Cod_Venda;
-      Cod_Produto := MTblVendaItemCOD_PRODUTO.AsInteger;
-      Des_Descricao := MTblVendaItemDES_DESCRICAO.AsString;
-      Val_PrecoUnitario := MTblVendaItemVAL_PRECOUNITARIO.AsFloat;
-      Val_Quantidade := MTblVendaItemVAL_QUANTIDADE.AsInteger;
-      Val_TotalItem := MTblVendaItemVAL_TOTALITEM.AsFloat;
-
-      if VendaItensController.Inserir(QryVendaItens, FVendaItens, TransacaoVendas, sErro) = false then
-        raise Exception.Create(sErro);
-    end;
-    MTblVendaItem.Next;
   end;
 end;
 
@@ -679,21 +782,46 @@ begin
   if not MTblVendaItem.Active then
     MTblVendaItem.Open;
 
-  with MTblVendaItem do
+  if alterouGrid then
   begin
-    MTblVendaItem.Append;
-    try
-      MTblVendaItemCOD_PRODUTO.AsInteger := LCbxProdutos.KeyValue;
-      MTblVendaItemDES_DESCRICAO.AsString := LCbxProdutos.Text;
-      MTblVendaItemVAL_QUANTIDADE.AsInteger := StrToInt(EdtQuantidade.Text);
-      MTblVendaItemVAL_PRECOUNITARIO.AsFloat := StrToFloat(StringReplace(StringReplace(EdtPrecoUnit.Text, '.', '', [rfReplaceAll]), ',', FormatSettings.DecimalSeparator, [rfReplaceAll]));
-      MTblVendaItemVAL_TOTALITEM.AsFloat := StrToFloat(StringReplace(StringReplace(EdtPrecoTotal.Text, '.', '', [rfReplaceAll]), ',', FormatSettings.DecimalSeparator, [rfReplaceAll]));
-      MTblVendaItem.Post;
-      totVenda := totVenda + MTblVendaItemVAL_TOTALITEM.AsFloat;
-      EdtTotalVenda.Text := FormatFloat('######0.00', totVenda);
-    except
-      MTblVendaItem.Cancel;
-      raise;
+    with MTblVendaItem do
+    begin
+      totVenda := totVenda - totVendaAnt;
+      MTblVendaItem.Locate('ID_VENDA', idItem, []);
+      MTblVendaItem.Edit;
+      try
+        MTblVendaItemCOD_PRODUTO.AsInteger := LCbxProdutos.KeyValue;
+        MTblVendaItemDES_DESCRICAO.AsString := LCbxProdutos.Text;
+        MTblVendaItemVAL_QUANTIDADE.AsInteger := StrToInt(EdtQuantidade.Text);
+        MTblVendaItemVAL_PRECOUNITARIO.AsFloat := StrToFloat(StringReplace(StringReplace(EdtPrecoUnit.Text, '.', '', [rfReplaceAll]), ',', FormatSettings.DecimalSeparator, [rfReplaceAll]));
+        MTblVendaItemVAL_TOTALITEM.AsFloat := StrToFloat(StringReplace(StringReplace(EdtPrecoTotal.Text, '.', '', [rfReplaceAll]), ',', FormatSettings.DecimalSeparator, [rfReplaceAll]));
+        MTblVendaItem.Post;
+        totVenda := totVenda + MTblVendaItemVAL_TOTALITEM.AsFloat;
+        EdtTotalVenda.Text := FormatFloat('######0.00', totVenda);
+      except
+        MTblVendaItem.Cancel;
+        raise;
+      end;
+    end;
+  end
+  else
+  begin
+    with MTblVendaItem do
+    begin
+      MTblVendaItem.Append;
+      try
+        MTblVendaItemCOD_PRODUTO.AsInteger := LCbxProdutos.KeyValue;
+        MTblVendaItemDES_DESCRICAO.AsString := LCbxProdutos.Text;
+        MTblVendaItemVAL_QUANTIDADE.AsInteger := StrToInt(EdtQuantidade.Text);
+        MTblVendaItemVAL_PRECOUNITARIO.AsFloat := StrToFloat(StringReplace(StringReplace(EdtPrecoUnit.Text, '.', '', [rfReplaceAll]), ',', FormatSettings.DecimalSeparator, [rfReplaceAll]));
+        MTblVendaItemVAL_TOTALITEM.AsFloat := StrToFloat(StringReplace(StringReplace(EdtPrecoTotal.Text, '.', '', [rfReplaceAll]), ',', FormatSettings.DecimalSeparator, [rfReplaceAll]));
+        MTblVendaItem.Post;
+        totVenda := totVenda + MTblVendaItemVAL_TOTALITEM.AsFloat;
+        EdtTotalVenda.Text := FormatFloat('######0.00', totVenda);
+      except
+        MTblVendaItem.Cancel;
+        raise;
+      end;
     end;
   end;
 end;
@@ -730,6 +858,7 @@ begin
   inherited;
   LPrecoUnitario := ProdutoController.GetValorUnitario(QryTemp, LCbxProdutos.KeyValue);
   EdtPrecoUnit.Text := FormatFloat('######0.00', LPrecoUnitario);
+  EdtQuantidade.Text := '1';
   EdtQuantidade.SetFocus;
 end;
 
@@ -752,12 +881,8 @@ var LValor: Double;
 begin
   inherited;
   if TryStrToFloat(EdtPrecoTotal.Text, LValor) then
-    EdtPrecoTotal.Text := FormatFloat('#,###,##0.00', LValor)
-  else
-  begin
-    ShowMessage('Valor inválido!');
-    EdtPrecoTotal.SetFocus;
-  end;
+    EdtPrecoTotal.Text := FormatFloat('######0.00', LValor)
+
 end;
 
 procedure TFrmCadVenda.EdtPrecoUnitKeyPress(Sender: TObject; var Key: Char);
@@ -772,13 +897,9 @@ var LValor: Double;
 begin
   inherited;
   if TryStrToFloat(EdtPrecoUnit.Text, LValor) then
-    EdtPrecoUnit.Text := FormatFloat('#,###,##0.00', LValor)
-  else
-  begin
-    ShowMessage('Valor inválido!');
-    EdtPrecoUnit.SetFocus;
-  end;
-end;
+    EdtPrecoUnit.Text := FormatFloat('######0.00', LValor)
+
+ end;
 
 procedure TFrmCadVenda.EdtQuantidadeKeyPress(Sender: TObject; var Key: Char);
 begin
@@ -788,15 +909,30 @@ begin
 end;
 
 procedure TFrmCadVenda.EdtQuantidadeExit(Sender: TObject);
-var LValorItem: Double;
+var LValorItem, LPrecoUnit: Double;
+    LQuantidade: Integer;
 begin
   inherited;
   if (EdtQuantidade.Text = EmptyStr) or (StrToInt(EdtQuantidade.Text) = 0) then
   begin
     MessageDlg('Informe um valor válido para Quantidade!', mtInformation, [mbOK], 0);
-    EdtQuantidade.SetFocus;
+    if EdtQuantidade.CanFocus then
+      EdtQuantidade.SetFocus;
+
     Exit;
   end;
+
+  if not TryStrToFloat(EdtPrecoUnit.Text, LPrecoUnit) then
+   LPrecoUnit := 0;
+
+  EdtPrecoUnit.Text := FormatFloat('######0.00', LPrecoUnit);
+
+  if not TryStrToInt(EdtQuantidade.Text, LQuantidade) then
+  begin
+    LQuantidade := 1;
+    EdtQuantidade.Text := '1';
+  end;
+
   LValorItem := (StrToInt(EdtQuantidade.Text) * StrToFloat(EdtPrecoUnit.Text));
   EdtPrecoTotal.Text := FormatFloat('#0.00', LValorItem);
 end;

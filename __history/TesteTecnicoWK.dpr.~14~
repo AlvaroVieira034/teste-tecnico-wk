@@ -1,0 +1,24 @@
+program TesteTecnicoWK;
+
+uses
+  Vcl.Forms,
+  umain in 'View\umain.pas' {FrmMain},
+  conexao.model in 'Model\conexao.model.pas',
+  connection.model in 'Model\connection.model.pas',
+  produto.model in 'Model\produto.model.pas',
+  produtorepository.model in 'Model\produtorepository.model.pas',
+  venda.model in 'Model\venda.model.pas',
+  vendaitens.model in 'Model\vendaitens.model.pas',
+  vendarepository.model in 'Model\vendarepository.model.pas',
+  produto.controller in 'Controller\produto.controller.pas',
+  ucadastropadrao in 'View\ucadastropadrao.pas' {FrmCadastroPadrao};
+
+{$R *.res}
+
+begin
+  Application.Initialize;
+  Application.MainFormOnTaskbar := True;
+  Application.CreateForm(TFrmMain, FrmMain);
+  Application.CreateForm(TFrmCadastroPadrao, FrmCadastroPadrao);
+  Application.Run;
+end.

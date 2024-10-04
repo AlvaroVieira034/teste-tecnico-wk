@@ -4,8 +4,10 @@ inherited FrmCadVenda: TFrmCadVenda
   Caption = 'Cadastro de Vendas'
   ClientHeight = 553
   ClientWidth = 719
+  KeyPreview = True
   Position = poMainFormCenter
   OnCreate = FormCreate
+  OnKeyDown = FormKeyDown
   OnShow = FormShow
   ExplicitWidth = 725
   ExplicitHeight = 582
@@ -15,14 +17,14 @@ inherited FrmCadVenda: TFrmCadVenda
     Width = 719
     ExplicitWidth = 719
     inherited BtnInserir: TSpeedButton
-      Left = 7
+      Left = 8
       OnClick = BtnInserirClick
-      ExplicitLeft = 7
+      ExplicitLeft = 8
     end
     inherited BtnAlterar: TSpeedButton
-      Left = 124
+      Left = 125
       OnClick = BtnAlterarClick
-      ExplicitLeft = 124
+      ExplicitLeft = 125
     end
     inherited BtnExcluir: TSpeedButton
       Left = 242
@@ -35,14 +37,14 @@ inherited FrmCadVenda: TFrmCadVenda
       ExplicitLeft = 360
     end
     inherited BtnCancelar: TSpeedButton
-      Left = 478
+      Left = 477
       OnClick = BtnCancelarClick
-      ExplicitLeft = 478
+      ExplicitLeft = 477
     end
     inherited BtnSair: TSpeedButton
-      Left = 596
+      Left = 595
       OnClick = BtnSairClick
-      ExplicitLeft = 596
+      ExplicitLeft = 595
     end
   end
   inherited PnlDados: TPanel
@@ -337,7 +339,7 @@ inherited FrmCadVenda: TFrmCadVenda
         Width = 61
         Height = 21
         Alignment = taRightJustify
-        TabOrder = 0
+        TabOrder = 1
         OnExit = EdtQuantidadeExit
         OnKeyPress = EdtQuantidadeKeyPress
       end
@@ -347,7 +349,7 @@ inherited FrmCadVenda: TFrmCadVenda
         Width = 100
         Height = 21
         Alignment = taRightJustify
-        TabOrder = 1
+        TabOrder = 2
         OnExit = EdtPrecoUnitExit
         OnKeyPress = EdtPrecoUnitKeyPress
       end
@@ -357,19 +359,19 @@ inherited FrmCadVenda: TFrmCadVenda
         Width = 100
         Height = 21
         Alignment = taRightJustify
-        TabOrder = 2
+        TabOrder = 3
         OnExit = EdtPrecoTotalExit
         OnKeyPress = EdtPrecoTotalKeyPress
       end
       object LCbxProdutos: TDBLookupComboBox
-        Left = 10
+        Left = 6
         Top = 33
         Width = 230
         Height = 21
         KeyField = 'COD_PRODUTO'
         ListField = 'DES_NOMEPRODUTO'
         ListFieldIndex = 1
-        TabOrder = 3
+        TabOrder = 0
         OnClick = LCbxProdutosClick
       end
       object BtnAddItemGrid: TButton
@@ -393,7 +395,7 @@ inherited FrmCadVenda: TFrmCadVenda
         OnClick = BtnDelItemGridClick
       end
       object DbGridItensPedido: TDBGrid
-        Left = 3
+        Left = 6
         Top = 60
         Width = 693
         Height = 223
@@ -404,6 +406,7 @@ inherited FrmCadVenda: TFrmCadVenda
         TitleFont.Height = -11
         TitleFont.Name = 'Tahoma'
         TitleFont.Style = []
+        OnKeyDown = DbGridItensPedidoKeyDown
         Columns = <
           item
             Expanded = False

@@ -65,20 +65,13 @@ begin
     ParamByName('VAL_QUANTIDADE').AsInteger := Val_Quantidade;
     ParamByName('VAL_TOTALITEM').AsFloat := Val_TotalItem;
 
-    // Inicia Transação
-    if not TransacaoItens.Connection.Connected then
-      TransacaoItens.Connection.Open();
-
     try
       Prepared := True;
-      TransacaoItens.StartTransaction;
       ExecSQL;
-      TransacaoItens.Commit;
       Result := True;
     except
       on E: Exception do
       begin
-        TransacaoItens.Rollback;
         sErro := 'Ocorreu um erro ao inserir um novo item da venda!' + sLineBreak + E.Message;
         Result := False;
         raise;
