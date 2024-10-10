@@ -22,29 +22,39 @@ inherited FrmCadVenda: TFrmCadVenda
       ExplicitLeft = 8
     end
     inherited BtnAlterar: TSpeedButton
-      Left = 125
+      Left = 121
+      Top = 16
       OnClick = BtnAlterarClick
-      ExplicitLeft = 125
+      ExplicitLeft = 121
+      ExplicitTop = 16
     end
     inherited BtnExcluir: TSpeedButton
       Left = 242
+      Top = 16
       OnClick = BtnExcluirClick
       ExplicitLeft = 242
+      ExplicitTop = 16
     end
     inherited BtnGravar: TSpeedButton
-      Left = 360
+      Left = 356
+      Top = 16
       OnClick = BtnGravarClick
-      ExplicitLeft = 360
+      ExplicitLeft = 356
+      ExplicitTop = 16
     end
     inherited BtnCancelar: TSpeedButton
       Left = 477
+      Top = 16
       OnClick = BtnCancelarClick
       ExplicitLeft = 477
+      ExplicitTop = 16
     end
     inherited BtnSair: TSpeedButton
-      Left = 595
+      Left = 598
+      Top = 16
       OnClick = BtnSairClick
-      ExplicitLeft = 595
+      ExplicitLeft = 598
+      ExplicitTop = 16
     end
   end
   inherited PnlDados: TPanel
@@ -242,8 +252,8 @@ inherited FrmCadVenda: TFrmCadVenda
         TabOrder = 4
       end
       object EdtCodCliente: TEdit
-        Left = 135
-        Top = 89
+        Left = 132
+        Top = 94
         Width = 76
         Height = 21
         Alignment = taRightJustify
@@ -264,7 +274,7 @@ inherited FrmCadVenda: TFrmCadVenda
       end
       object BtnInserirItens: TButton
         Left = 286
-        Top = 141
+        Top = 148
         Width = 121
         Height = 30
         Caption = 'In&serir Itens'
@@ -344,7 +354,7 @@ inherited FrmCadVenda: TFrmCadVenda
         OnKeyPress = EdtQuantidadeKeyPress
       end
       object EdtPrecoUnit: TEdit
-        Left = 322
+        Left = 316
         Top = 33
         Width = 100
         Height = 21
@@ -364,7 +374,7 @@ inherited FrmCadVenda: TFrmCadVenda
         OnKeyPress = EdtPrecoTotalKeyPress
       end
       object LCbxProdutos: TDBLookupComboBox
-        Left = 6
+        Left = 3
         Top = 33
         Width = 230
         Height = 21
@@ -412,7 +422,6 @@ inherited FrmCadVenda: TFrmCadVenda
             Expanded = False
             FieldName = 'DES_DESCRICAO'
             Title.Caption = 'Produto'
-            Width = 64
             Visible = True
           end
           item
