@@ -18,43 +18,45 @@ inherited FrmCadVenda: TFrmCadVenda
     ExplicitWidth = 719
     inherited BtnInserir: TSpeedButton
       Left = 8
+      Top = 12
       OnClick = BtnInserirClick
       ExplicitLeft = 8
+      ExplicitTop = 12
     end
     inherited BtnAlterar: TSpeedButton
-      Left = 121
-      Top = 16
+      Left = 126
+      Top = 12
       OnClick = BtnAlterarClick
-      ExplicitLeft = 121
-      ExplicitTop = 16
+      ExplicitLeft = 126
+      ExplicitTop = 12
     end
     inherited BtnExcluir: TSpeedButton
       Left = 242
-      Top = 16
+      Top = 12
       OnClick = BtnExcluirClick
       ExplicitLeft = 242
-      ExplicitTop = 16
+      ExplicitTop = 12
     end
     inherited BtnGravar: TSpeedButton
       Left = 356
-      Top = 16
+      Top = 12
       OnClick = BtnGravarClick
       ExplicitLeft = 356
-      ExplicitTop = 16
+      ExplicitTop = 12
     end
     inherited BtnCancelar: TSpeedButton
       Left = 477
-      Top = 16
+      Top = 12
       OnClick = BtnCancelarClick
       ExplicitLeft = 477
-      ExplicitTop = 16
+      ExplicitTop = 12
     end
     inherited BtnSair: TSpeedButton
       Left = 598
-      Top = 16
+      Top = 12
       OnClick = BtnSairClick
       ExplicitLeft = 598
-      ExplicitTop = 16
+      ExplicitTop = 12
     end
   end
   inherited PnlDados: TPanel
@@ -175,7 +177,7 @@ inherited FrmCadVenda: TFrmCadVenda
         OnClick = BtnLimpaCamposClick
       end
       object BtnPesquisar: TSpeedButton
-        Left = 211
+        Left = 210
         Top = 25
         Width = 29
         Height = 23
@@ -218,7 +220,7 @@ inherited FrmCadVenda: TFrmCadVenda
         OnClick = BtnPesquisarClick
       end
       object EdtCodVenda: TEdit
-        Left = 135
+        Left = 134
         Top = 26
         Width = 74
         Height = 21
@@ -232,8 +234,8 @@ inherited FrmCadVenda: TFrmCadVenda
         OnKeyPress = EdtCodVendaKeyPress
       end
       object EdtDataVenda: TEdit
-        Left = 135
-        Top = 57
+        Left = 134
+        Top = 58
         Width = 74
         Height = 21
         Alignment = taRightJustify
@@ -243,8 +245,8 @@ inherited FrmCadVenda: TFrmCadVenda
         OnChange = EdtDataVendaChange
       end
       object EdtTotalVenda: TEdit
-        Left = 135
-        Top = 121
+        Left = 134
+        Top = 117
         Width = 76
         Height = 21
         Alignment = taRightJustify
@@ -252,8 +254,8 @@ inherited FrmCadVenda: TFrmCadVenda
         TabOrder = 4
       end
       object EdtCodCliente: TEdit
-        Left = 132
-        Top = 94
+        Left = 134
+        Top = 90
         Width = 76
         Height = 21
         Alignment = taRightJustify
