@@ -2,7 +2,8 @@ unit cliente.controller;
 
 interface
 
-uses cliente.model, clienterepository.model, conexao.model, System.SysUtils, FireDAC.Comp.Client, FireDAC.Stan.Param;
+uses cliente.model, cliente.repository, conexao.service, System.SysUtils, FireDAC.Comp.Client, FireDAC.Stan.Param,
+  Data.DB;
 
 type
   TCampoInvalido = (ciData, ciCliente, ciValor, ciValorZero);
@@ -15,14 +16,13 @@ type
   public
     constructor Create();
     destructor Destroy; override;
-    procedure PreencherGrid(TblClientes: TFDQuery; APesquisa, ACampo: string);
-    procedure PreencherComboCliente(TblClientes: TFDQuery);
-    procedure CarregarCampos(QryClientes: TFDQuery; FCliente: TCliente; ACodigo: Integer);
-    function Inserir(QryClientes: TFDQuery; FCliente: TCliente; Transacao: TFDTransaction; out sErro: string): Boolean;
-    function Alterar(QryClientes: TFDQuery; FCliente: TCliente; Transacao: TFDTransaction; ACodigo: Integer; out sErro: string): Boolean;
-    function Excluir(QryClientes: TFDQuery; Transacao: TFDTransaction; ACodigo: Integer; out sErro : string): Boolean;
-
-
+    procedure PreencherGrid(APesquisa, ACampo: string);
+    procedure PreencherComboCliente;
+    procedure CarregarCampos(FCliente: TCliente; ACodigo: Integer);
+    function Inserir(FCliente: TCliente; out sErro: string): Boolean;
+    function Alterar(FCliente: TCliente; ACodigo: Integer; out sErro: string): Boolean;
+    function Excluir(ACodigo: Integer; out sErro : string): Boolean;
+    function GetDataSource: TDataSource;
 
   end;
 
@@ -44,11 +44,9 @@ begin
   inherited;
 end;
 
-procedure TClienteController.PreencherGrid(TblClientes: TFDQuery; APesquisa, ACampo: string);
+procedure TClienteController.PreencherGrid(APesquisa, ACampo: string);
 var LCampo, SErro: string;
-    //ClienteRepo: TClienteRepository;
 begin
-  //ClienteRepo := TClienteRepository.Create;
   try
     if ACampo = 'Código' then
       LCampo := 'cli.cd_cliente';
@@ -62,7 +60,7 @@ begin
     if ACampo = '' then
       LCampo := 'cli.des_nomecliente';
 
-    FClienteRepo.PreencherGrid(TblClientes, APesquisa, LCampo);
+    FClienteRepo.PreencherGrid(APesquisa, LCampo);
   except on E: Exception do
     begin
       SErro := 'Ocorreu um erro ao pesquisar a venda!' + sLineBreak + E.Message;
@@ -71,30 +69,35 @@ begin
   end;
 end;
 
-procedure TClienteController.PreencherComboCliente(TblClientes: TFDQuery);
+procedure TClienteController.PreencherComboCliente;
 begin
-  FClienteRepo.PreencherComboCliente(TblClientes);
+  FClienteRepo.PreencherComboCliente();
 end;
 
-function TClienteController.Inserir(QryClientes: TFDQuery; FCliente: TCliente; Transacao: TFDTransaction; out sErro: string): Boolean;
-begin
-
-end;
-
-procedure TClienteController.CarregarCampos(QryClientes: TFDQuery; FCliente: TCliente; ACodigo: Integer);
+function TClienteController.Inserir(FCliente: TCliente; out sErro: string): Boolean;
 begin
 
 end;
 
-function TClienteController.Alterar(QryClientes: TFDQuery; FCliente: TCliente; Transacao: TFDTransaction; ACodigo: Integer; out sErro: string): Boolean;
+procedure TClienteController.CarregarCampos(FCliente: TCliente; ACodigo: Integer);
 begin
 
 end;
 
-function TClienteController.Excluir(QryClientes: TFDQuery;  Transacao: TFDTransaction; ACodigo: Integer; out sErro: string): Boolean;
+function TClienteController.Alterar(FCliente: TCliente; ACodigo: Integer; out sErro: string): Boolean;
 begin
 
 end;
 
+function TClienteController.Excluir(ACodigo: Integer; out sErro: string): Boolean;
+begin
+
+end;
+
+
+function TClienteController.GetDataSource: TDataSource;
+begin
+  Result := FClienteRepo.GetDataSource;
+end;
 
 end.

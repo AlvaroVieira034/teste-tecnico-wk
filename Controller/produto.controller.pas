@@ -2,7 +2,8 @@ unit produto.controller;
 
 interface
 
-uses umain, produto.model, produtorepository.model, system.SysUtils, Vcl.Forms, FireDAC.Comp.Client;
+uses produto.model, produto.repository, iproduto.repository, system.SysUtils, Vcl.Forms,
+     FireDAC.Comp.Client, Data.DB;
 
 type
   TCampoInvalido = (ciNome, ciDescricao, ciPreco, ciPrecoZero);
@@ -10,19 +11,22 @@ type
 
   private
     FProduto: TProduto;
-    FProdutoRepo: TProdutoRepository;
+    FProdutoRepo: IProdutoRepository;
+    FDataSource: TDataSource;
 
   public
+    //constructor Create(ARepository: IProdutoRepository);
     constructor Create();
     destructor Destroy; override;
-    procedure PreencherGrid(TblProdutos: TFDQuery; APesquisa, ACampo: string);
-    procedure PreencherComboProduto(TblProdutos: TFDQuery);
-    function CarregarCampos(QryProdutos: TFDQuery; FProduto: TProduto; iCodigo: Integer): Boolean;
-    function Inserir(QryProdutos: TFDQuery; FProduto: TProduto; Transacao: TFDTransaction; var sErro: string): Boolean;
-    function Alterar(QryProdutos: TFDQuery; FProduto: TProduto; Transacao: TFDTransaction; iCodigo: Integer; sErro: string): Boolean;
-    function Excluir(QryProdutos: TFDQuery; Transacao: TFDTransaction; iCodigo: Integer; var sErro: string): Boolean;
+    procedure PreencherGrid(APesquisa, ACampo: string);
+    procedure PreencherComboProduto;
+    function CarregarCampos(FProduto: TProduto; iCodigo: Integer): Boolean;
+    function Inserir(FProduto: TProduto; var sErro: string): Boolean;
+    function Alterar(FProduto: TProduto; iCodigo: Integer; sErro: string): Boolean;
+    function Excluir(iCodigo: Integer; var sErro: string): Boolean;
     function ValidarDados(const ADescricao, APreco: string; out AErro: TCampoInvalido): Boolean;
-    function GetValorUnitario(QryTemp: TFDQuery; ACodigo: Integer): Double;
+    function GetValorUnitario(ACodigo: Integer): Double;
+    function GetDataSource: TDataSource;
 
   end;
 
@@ -30,7 +34,7 @@ implementation
 
 { TProdutoController }
 
-constructor TProdutoController.Create();
+constructor TProdutoController.Create;
 begin
   FProduto := TProduto.Create();
   FProdutoRepo := TProdutoRepository.Create;
@@ -39,11 +43,10 @@ end;
 destructor TProdutoController.Destroy;
 begin
   FProduto.Free;
-  FProdutoRepo.Free;
   inherited;
 end;
 
-procedure TProdutoController.PreencherGrid(TblProdutos: TFDQuery; APesquisa, ACampo: string);
+procedure TProdutoController.PreencherGrid(APesquisa, ACampo: string);
 var LCampo, sErro: string;
 begin
   if ACampo = 'Código' then
@@ -55,19 +58,19 @@ begin
   if ACampo = '' then
     LCampo := 'prd.des_descricao';
 
-  FProdutoRepo.PreencherGrid(TblProdutos, APesquisa, LCampo);
+  FProdutoRepo.PreencherGrid(APesquisa, LCampo);
 end;
 
-procedure TProdutoController.PreencherComboProduto(TblProdutos: TFDQuery);
+procedure TProdutoController.PreencherComboProduto;
 begin
-  FProdutoRepo.PreencherComboProduto(TblProdutos);
+  FProdutoRepo.PreencherComboProduto;
 end;
 
-function TProdutoController.CarregarCampos(QryProdutos: TFDQuery; FProduto: TProduto; iCodigo: Integer): Boolean;
+function TProdutoController.CarregarCampos(FProduto: TProduto; iCodigo: Integer): Boolean;
 var sErro: string;
 begin
   try
-    FProdutoRepo.CarregarCampos(QryProdutos, FProduto, iCodigo);
+    FProdutoRepo.CarregarCampos(FProduto, iCodigo);
   except on E: Exception do
     begin
       sErro := 'Ocorreu um erro ao carregar o produto!' + sLineBreak + E.Message;
@@ -77,24 +80,24 @@ begin
   end;
 end;
 
-function TProdutoController.Inserir(QryProdutos: TFDQuery; FProduto: TProduto; Transacao: TFDTransaction; var sErro: string): Boolean;
+function TProdutoController.Inserir(FProduto: TProduto; var sErro: string): Boolean;
 begin
-  Result := FProdutoRepo.Inserir(QryProdutos, FProduto, Transacao, sErro);
+  Result := FProdutoRepo.Inserir(FProduto, sErro);
 end;
 
-function TProdutoController.Alterar(QryProdutos: TFDQuery; FProduto: TProduto; Transacao: TFDTransaction; iCodigo: Integer; sErro: string): Boolean;
+function TProdutoController.Alterar(FProduto: TProduto; iCodigo: Integer; sErro: string): Boolean;
 begin
-  Result := FProdutoRepo.Alterar(QryProdutos, FProduto, Transacao, iCodigo, sErro);
+  Result := FProdutoRepo.Alterar(FProduto, iCodigo, sErro);
 end;
 
-function TProdutoController.Excluir(QryProdutos: TFDQuery; Transacao: TFDTransaction; iCodigo: Integer; var sErro: String): Boolean;
+function TProdutoController.Excluir(iCodigo: Integer; var sErro: String): Boolean;
 begin
-  Result := FProdutoRepo.Excluir(QryProdutos, Transacao, iCodigo, sErro);
+  Result := FProdutoRepo.Excluir(iCodigo, sErro);
 end;
 
-function TProdutoController.GetValorUnitario(QryTemp: TFDQuery; ACodigo: Integer): Double;
+function TProdutoController.GetValorUnitario(ACodigo: Integer): Double;
 begin
-  Result := FProdutoRepo.GetValorUnitario(QryTemp, ACodigo);
+  Result := FProdutoRepo.GetValorUnitario(ACodigo);
 end;
 
 function TProdutoController.ValidarDados(const ADescricao, APreco: string; out AErro: TCampoInvalido): Boolean;
@@ -120,6 +123,11 @@ begin
     Result := False;
     Exit;
   end;
+end;
+
+function TProdutoController.GetDataSource: TDataSource;
+begin
+  Result := FProdutoRepo.GetDataSource;
 end;
 
 end.

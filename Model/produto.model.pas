@@ -2,7 +2,7 @@ unit produto.model;
 
 interface
 
-uses umain, System.SysUtils, FireDAC.Comp.Client, FireDAC.DApt;
+uses System.SysUtils, FireDAC.Comp.Client, FireDAC.DApt;
 
 type
   TProduto = class

@@ -1,0 +1,34 @@
+program TesteTecnicoWK;
+
+uses
+  Vcl.Forms,
+  umain in 'View\umain.pas' {FrmMain},
+  conexao.model in 'Model\conexao.model.pas',
+  connection.model in 'Model\connection.model.pas',
+  produto.model in 'Model\produto.model.pas',
+  produtorepository.model in 'Model\produtorepository.model.pas',
+  venda.model in 'Model\venda.model.pas',
+  vendaitens.model in 'Model\vendaitens.model.pas',
+  vendarepository.model in 'Model\vendarepository.model.pas',
+  produto.controller in 'Controller\produto.controller.pas',
+  ucadastropadrao in 'View\ucadastropadrao.pas' {FrmCadastroPadrao},
+  ucadproduto in 'View\ucadproduto.pas' {FrmCadProduto},
+  ucadvenda in 'View\ucadvenda.pas' {FrmCadVenda},
+  venda.controller in 'Controller\venda.controller.pas',
+  untFormat in 'lib\untFormat.pas',
+  upesqvendas in 'View\upesqvendas.pas' {FrmPesquisaVendas},
+  vendaitens.controller in 'Controller\vendaitens.controller.pas',
+  vendaitensrepository.model in 'Model\vendaitensrepository.model.pas',
+  clienterepository.model in 'Model\clienterepository.model.pas',
+  cliente.model in 'Model\cliente.model.pas',
+  cliente.controller in 'Controller\cliente.controller.pas',
+  uprodutorepositoryintf in 'Interfaces\uprodutorepositoryintf.pas';
+
+{$R *.res}
+
+begin
+  Application.Initialize;
+  Application.MainFormOnTaskbar := True;
+  Application.CreateForm(TFrmMain, FrmMain);
+  Application.Run;
+end.

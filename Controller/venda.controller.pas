@@ -2,7 +2,7 @@ unit venda.controller;
 
 interface
 
-uses umain, venda.model, vendarepository.model, system.SysUtils, Vcl.Forms, FireDAC.Comp.Client;
+uses umain, venda.model, venda.repository, system.SysUtils, Vcl.Forms, FireDAC.Comp.Client;
 
 type
   TVendaController = class

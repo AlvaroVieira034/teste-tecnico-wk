@@ -10,7 +10,7 @@ uses
   FireDAC.UI.Intf, FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async,
   FireDAC.Phys, FireDAC.Phys.MSSQL, FireDAC.Phys.MSSQLDef, FireDAC.VCLUI.Wait, FireDAC.Stan.Param,
   FireDAC.DatS, FireDAC.DApt.Intf, FireDAC.DApt, FireDAC.Comp.DataSet, FireDAC.Comp.Client,
-  conexao.model, produto.model, produto.controller;
+  conexao.service, produto.model, produto.controller;
 
 {$ENDREGION}
 
@@ -52,11 +52,11 @@ type
 
   private
     ValoresOriginais: array of string;
-    TblProdutos: TFDQuery;
-    QryProdutos: TFDQuery;
-    QryTemp: TFDQuery;
-    DsProdutos: TDataSource;
-    TransacaoProdutos: TFDTransaction;
+    //TblProdutos: TFDQuery;
+    //QryProdutos: TFDQuery;
+    //QryTemp: TFDQuery;
+    //DsProdutos: TDataSource;
+    //TransacaoProdutos: TFDTransaction;
     FProduto: TProduto;
     ProdutoController: TProdutoController;
 
@@ -70,11 +70,11 @@ type
     procedure LimpaCampos(AOperacao: TOperacao);
     procedure VerificaBotoes(AOperacao: TOperacao);
     procedure MostrarMensagemErro(AErro: TCampoInvalido);
-    procedure CriarTabelas;
-    procedure CriarCamposTabelas;
+    function GetDataSource: TDataSource;
 
   public
     FOperacao: TOperacao;
+    DsProdutos: TDataSource;
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
   end;
@@ -91,38 +91,26 @@ uses untFormat;
 constructor TFrmCadProduto.Create(AOwner: TComponent);
 begin
   inherited;
-  TransacaoProdutos := TFDTransaction.Create(nil);
   DsProdutos := TDataSource.Create(nil);
-  TblProdutos := TFDQuery.Create(nil);
-  QryProdutos := TFDQuery.Create(nil);
-  QryTemp := TFDQuery.Create(nil);
 end;
 
 destructor TFrmCadProduto.Destroy;
 begin
-  DsProdutos.Free;
-  TblProdutos.Free;
-  QryProdutos.Free;
-  QryTemp.Free;
-  TransacaoProdutos.Free;
-  inherited;
+  if Assigned(DsProdutos) then
+    DsProdutos.Free;
+
+  inherited Destroy;
 end;
 
 procedure TFrmCadProduto.FormCreate(Sender: TObject);
-var sCampo: string;
-    StringField: TStringField;
-    IntegerField: TIntegerField;
-    DateField: TDateField;
-    FloatField: TFloatField;
 begin
   inherited;
   if TConexao.GetInstance.Connection.TestarConexao then
   begin
     TConexao.GetInstance.Connection.InciarTransacao;
-    CriarTabelas();
-    CriarCamposTabelas();
     FProduto := TProduto.Create;
     ProdutoController := TProdutoController.Create;
+    GetDataSource();
     FOperacao := opInicio;
     SetLength(ValoresOriginais, 3);
   end
@@ -137,20 +125,27 @@ procedure TFrmCadProduto.FormShow(Sender: TObject);
 begin
   inherited;
   PreencherGrid();
+  DsProdutos := ProdutoController.GetDataSource();
   VerificaBotoes(FOperacao);
   if EdtPesquisar.CanFocus then
     EdtPesquisar.SetFocus;
 end;
 
+function TFrmCadProduto.GetDataSource: TDataSource;
+begin
+   DBGridProdutos.DataSource := ProdutoController.GetDataSource();
+end;
+
 procedure TFrmCadProduto.PreencherGrid;
 begin
-  ProdutoController.PreencherGrid(TblProdutos, Trim(EdtPesquisar.Text) + '%', CbxFiltro.Text);
-  LblTotRegistros.Caption := 'Produtos: ' + InttoStr(DsProdutos.DataSet.RecordCount);
+  ProdutoController.PreencherGrid(Trim(EdtPesquisar.Text) + '%', CbxFiltro.Text);
+  LblTotRegistros.Caption := 'Produtos: ' + InttoStr(DBGridProdutos.DataSource.DataSet.RecordCount);
 end;
 
 procedure TFrmCadProduto.CarregarCampos;
 begin
-  ProdutoController.CarregarCampos(QryProdutos, FProduto, DsProdutos.DataSet.FieldByName('COD_PRODUTO').AsInteger);
+  DsProdutos := ProdutoController.GetDataSource();
+  ProdutoController.CarregarCampos(FProduto, DsProdutos.DataSet.FieldByName('COD_PRODUTO').AsInteger);
   with FProduto do
   begin
     EdtCodProduto.Text := IntToStr(Cod_Produto);
@@ -160,6 +155,7 @@ begin
   ValoresOriginais[0] := EdtCodProduto.Text;
   ValoresOriginais[1] := EdtDescricao.Text;
   ValoresOriginais[2] := EdtPrecoUnitario.Text;
+  BtnPesquisar.Click;
 end;
 
 procedure TFrmCadProduto.CbxFiltroClick(Sender: TObject);
@@ -178,7 +174,7 @@ begin
     StringReplace(StringReplace(EdtPrecoUnitario.Text, '.', '', [rfReplaceAll]), ',', FormatSettings.DecimalSeparator, [rfReplaceAll]));
   end;
 
-  if ProdutoController.Inserir(QryProdutos, FProduto, TransacaoProdutos, sErro) = false then
+  if ProdutoController.Inserir(FProduto, sErro) = false then
     raise Exception.Create(sErro)
   else
     MessageDlg('Produto incluido com sucesso !!', mtInformation, [mbOk], 0);
@@ -194,7 +190,7 @@ begin
     StringReplace(StringReplace(EdtPrecoUnitario.Text, '.', '', [rfReplaceAll]), ',', FormatSettings.DecimalSeparator, [rfReplaceAll]));
   end;
 
-  if ProdutoController.Alterar(QryProdutos, FProduto, TransacaoProdutos, StrToInt(EdtCodProduto.Text), sErro) = False then
+  if ProdutoController.Alterar(FProduto, StrToInt(EdtCodProduto.Text), sErro) = False then
     raise Exception.Create(sErro)
   else
     MessageDlg('Produto alterado com sucesso !!', mtInformation, [mbOK], 0);
@@ -206,25 +202,24 @@ begin
   inherited;
   if TryStrToFloat(EdtPrecoUnitario.Text, LValor) then
     EdtPrecoUnitario.Text := FormatFloat('#,###,##0.00', LValor)
- 
-end;
 
+end;
 
 procedure TFrmCadProduto.Excluir;
 var sErro : String;
 begin
   if MessageDlg('Deseja realmente excluir o produto selecionado ?',mtConfirmation, [mbYes, mbNo],0) = IDYES then
-    if ProdutoController.Excluir(QryProdutos, TransacaoProdutos, DsProdutos.DataSet.FieldByName('COD_PRODUTO').AsInteger, sErro) = False then
+    if ProdutoController.Excluir(DsProdutos.DataSet.FieldByName('COD_PRODUTO').AsInteger, sErro) = False then
       raise Exception.Create(sErro);
 end;
 
 function TFrmCadProduto.ValidarDados: Boolean;
-var lErro: TCampoInvalido;
+var LErro: TCampoInvalido;
 begin
-  Result := ProdutoController.ValidarDados(EdtDescricao.Text, EdtPrecoUnitario.Text, lErro);
+  Result := ProdutoController.ValidarDados(EdtDescricao.Text, EdtPrecoUnitario.Text, LErro);
   if not Result then
   begin
-    MostrarMensagemErro(lErro);
+    MostrarMensagemErro(LErro);
     Exit(False);
   end;
 
@@ -362,45 +357,6 @@ begin
   inherited;
   Excluir();
   DsProdutos.DataSet.Refresh;
-end;
-
-procedure TFrmCadProduto.CriarCamposTabelas;
-var
-  FloatField: TFloatField;
-  StringField: TStringField;
-  DateField: TDateField;
-  IntegerField: TIntegerField;
-begin
-  // Criando o campo COD_PRODUTO
-  IntegerField := TIntegerField.Create(TblProdutos);
-  IntegerField.FieldName := 'COD_PRODUTO';
-  IntegerField.DataSet := TblProdutos;
-  IntegerField.Name := 'TblProdutosCOD_PRODUTO';
-
-  // Criando o campo NOME_PRODUTO
-  StringField := TStringField.Create(TblProdutos);
-  StringField.FieldName := 'DES_DESCRICAO';
-  StringField.Size := 100;
-  StringField.DataSet := TblProdutos;
-  StringField.Name := 'TblProdutosDES_DESCRICAO';
-
-  // Criando o campo VAL_PRECO
-  FloatField := TFloatField.Create(TblProdutos);
-  FloatField.FieldName := 'VAL_PRECO';
-  FloatField.DataSet := TblProdutos;
-  FloatField.Name := 'TblProdutosVAL_PRECO';
-  FloatField.DisplayFormat := '#,###,##0.00';
-end;
-
-procedure TFrmCadProduto.CriarTabelas;
-begin
-  TransacaoProdutos := TConexao.GetInstance.Connection.CriarTransaction;
-  TblProdutos := TConexao.GetInstance.Connection.CriarQuery;
-  QryProdutos := TConexao.GetInstance.Connection.CriarQuery;
-  QryProdutos.Transaction := TransacaoProdutos;
-  DsProdutos := TConexao.GetInstance.Connection.CriarDataSource;
-  DsProdutos.DataSet := TblProdutos;
-  DBGridProdutos.DataSource := DsProdutos;
 end;
 
 procedure TFrmCadProduto.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);

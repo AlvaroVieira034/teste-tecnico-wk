@@ -2,7 +2,7 @@ unit vendaitens.controller;
 
 interface
 
-uses umain, vendaitens.model, vendaitensrepository.model, system.SysUtils, Vcl.Forms, FireDAC.Comp.Client;
+uses umain, vendaitens.model, vendaitens.repository, system.SysUtils, Vcl.Forms, FireDAC.Comp.Client;
 
 type
   TCampoInvalido = (ciData, ciDescricao, ciCliente, ciValor, ciValorZero);

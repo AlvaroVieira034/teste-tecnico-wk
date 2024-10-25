@@ -97,14 +97,6 @@
             <Form>FrmMain</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="Model\conexao.model.pas"/>
-        <DCCReference Include="Model\connection.model.pas"/>
-        <DCCReference Include="Model\produto.model.pas"/>
-        <DCCReference Include="Model\produtorepository.model.pas"/>
-        <DCCReference Include="Model\venda.model.pas"/>
-        <DCCReference Include="Model\vendaitens.model.pas"/>
-        <DCCReference Include="Model\vendarepository.model.pas"/>
-        <DCCReference Include="Controller\produto.controller.pas"/>
         <DCCReference Include="View\ucadastropadrao.pas">
             <Form>FrmCadastroPadrao</Form>
             <FormType>dfm</FormType>
@@ -117,17 +109,28 @@
             <Form>FrmCadVenda</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="Controller\venda.controller.pas"/>
-        <DCCReference Include="lib\untFormat.pas"/>
         <DCCReference Include="View\upesqvendas.pas">
             <Form>FrmPesquisaVendas</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="Controller\vendaitens.controller.pas"/>
-        <DCCReference Include="Model\vendaitensrepository.model.pas"/>
-        <DCCReference Include="Model\clienterepository.model.pas"/>
-        <DCCReference Include="Model\cliente.model.pas"/>
-        <DCCReference Include="Controller\cliente.controller.pas"/>
+        <DCCReference Include="controller\cliente.controller.pas"/>
+        <DCCReference Include="controller\produto.controller.pas"/>
+        <DCCReference Include="controller\venda.controller.pas"/>
+        <DCCReference Include="controller\vendaitens.controller.pas"/>
+        <DCCReference Include="util\lib\untFormat.pas"/>
+        <DCCReference Include="interface\icliente.repository.pas"/>
+        <DCCReference Include="interface\iproduto.repository.pas"/>
+        <DCCReference Include="service\conexao\conexao.service.pas"/>
+        <DCCReference Include="service\conexao\connection.service.pas"/>
+        <DCCReference Include="service\cep\cep.service.pas"/>
+        <DCCReference Include="model\cliente.model.pas"/>
+        <DCCReference Include="model\produto.model.pas"/>
+        <DCCReference Include="model\venda.model.pas"/>
+        <DCCReference Include="model\vendaitens.model.pas"/>
+        <DCCReference Include="repository\cliente.repository.pas"/>
+        <DCCReference Include="repository\produto.repository.pas"/>
+        <DCCReference Include="repository\venda.repository.pas"/>
+        <DCCReference Include="repository\vendaitens.repository.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -156,33 +159,18 @@
                 </Excluded_Packages>
             </Delphi.Personality>
             <Deployment Version="3">
-                <DeployFile LocalName="Win32\Debug\TesteTecnicoWK.exe" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="TesteTecnicoWK.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>TesteTecnicoWK.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployClass Name="DependencyModule">
-                    <Platform Name="Win32">
-                        <Operation>0</Operation>
-                        <Extensions>.dll;.bpl</Extensions>
-                    </Platform>
+                <DeployClass Name="ProjectiOSDeviceResourceRules">
                     <Platform Name="iOSDevice64">
                         <Operation>1</Operation>
-                        <Extensions>.dylib</Extensions>
-                    </Platform>
-                    <Platform Name="OSX32">
-                        <RemoteDir>Contents\MacOS</RemoteDir>
-                        <Operation>1</Operation>
-                        <Extensions>.dylib</Extensions>
                     </Platform>
                     <Platform Name="iOSDevice32">
                         <Operation>1</Operation>
-                        <Extensions>.dylib</Extensions>
-                    </Platform>
-                    <Platform Name="iOSSimulator">
-                        <Operation>1</Operation>
-                        <Extensions>.dylib</Extensions>
                     </Platform>
                 </DeployClass>
                 <DeployClass Name="ProjectOSXResource">
@@ -562,12 +550,27 @@
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
-                <DeployClass Name="ProjectiOSDeviceResourceRules">
+                <DeployClass Name="DependencyModule">
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                        <Extensions>.dll;.bpl</Extensions>
+                    </Platform>
                     <Platform Name="iOSDevice64">
                         <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="OSX32">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
                     </Platform>
                     <Platform Name="iOSDevice32">
                         <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
                     </Platform>
                 </DeployClass>
                 <ProjectRoot Platform="iOSDevice64" Name="$(PROJECTNAME).app"/>

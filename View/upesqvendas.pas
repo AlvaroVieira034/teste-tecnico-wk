@@ -53,7 +53,7 @@ implementation
 
 {$R *.dfm}
 
-uses conexao.model, ucadvenda;
+uses conexao.service, ucadvenda;
 
 constructor TFrmPesquisaVendas.Create(AOwner: TComponent);
 begin

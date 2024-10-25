@@ -1,0 +1,36 @@
+program TesteTecnicoWK;
+
+uses
+  Vcl.Forms,
+  umain in 'View\umain.pas' {FrmMain},
+  produto.model in 'Model\produto.model.pas',
+  venda.model in 'Model\venda.model.pas',
+  vendaitens.model in 'Model\vendaitens.model.pas',
+  ucadastropadrao in 'View\ucadastropadrao.pas' {FrmCadastroPadrao},
+  ucadproduto in 'View\ucadproduto.pas' {FrmCadProduto},
+  ucadvenda in 'View\ucadvenda.pas' {FrmCadVenda},
+  upesqvendas in 'View\upesqvendas.pas' {FrmPesquisaVendas},
+  cliente.model in 'Model\cliente.model.pas',
+  produtorepository.model in 'repository\produtorepository.model.pas',
+  vendaitensrepository.model in 'repository\vendaitensrepository.model.pas',
+  vendarepository.model in 'repository\vendarepository.model.pas',
+  clienterepository.model in 'repository\clienterepository.model.pas',
+  cliente.controller in 'controller\cliente.controller.pas',
+  produto.controller in 'controller\produto.controller.pas',
+  venda.controller in 'controller\venda.controller.pas',
+  vendaitens.controller in 'controller\vendaitens.controller.pas',
+  untFormat in 'util\lib\untFormat.pas',
+  icliente.repository in 'interface\icliente.repository.pas',
+  iproduto.repository in 'interface\iproduto.repository.pas',
+  conexao.service in 'service\conexao\conexao.service.pas',
+  connection.service in 'service\conexao\connection.service.pas',
+  cep.service in 'service\cep\cep.service.pas';
+
+{$R *.res}
+
+begin
+  Application.Initialize;
+  Application.MainFormOnTaskbar := True;
+  Application.CreateForm(TFrmMain, FrmMain);
+  Application.Run;
+end.

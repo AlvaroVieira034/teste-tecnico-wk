@@ -9,7 +9,7 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, UCadastroPadrao, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls,
   Data.DB, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param, FireDAC.Stan.Error,
   FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Comp.DataSet, FireDAC.Comp.Client,
-  Vcl.Grids, Vcl.DBGrids, Vcl.DBCtrls, conexao.model, produto.model, produto.controller,
+  Vcl.Grids, Vcl.DBGrids, Vcl.DBCtrls, conexao.service, produto.model, produto.controller,
   cliente.model, cliente.controller, venda.model, vendaitens.model, venda.controller,
   vendaitens.controller, untFormat, upesqvendas;
 {$ENDREGION}
@@ -269,8 +269,8 @@ procedure TFrmCadVenda.FormShow(Sender: TObject);
 begin
   inherited;
   totVenda := 0;
-  ClienteController.PreencherComboCliente(TblClientes);
-  ProdutoController.PreencherComboProduto(TblProdutos);
+  ClienteController.PreencherComboCliente();
+  ProdutoController.PreencherComboProduto();
 
   DbGridItensPedido.Columns[0].Width := 290;
   DbGridItensPedido.Columns[1].Width := 80;
@@ -856,7 +856,7 @@ procedure TFrmCadVenda.LCbxProdutosClick(Sender: TObject);
 var LPrecoUnitario: Double;
 begin
   inherited;
-  LPrecoUnitario := ProdutoController.GetValorUnitario(QryTemp, LCbxProdutos.KeyValue);
+  LPrecoUnitario := ProdutoController.GetValorUnitario(LCbxProdutos.KeyValue);
   EdtPrecoUnit.Text := FormatFloat('######0.00', LPrecoUnitario);
   EdtQuantidade.Text := '1';
   EdtQuantidade.SetFocus;
