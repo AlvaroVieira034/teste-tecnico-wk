@@ -10,7 +10,7 @@ uses
   FireDAC.UI.Intf, FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async,
   FireDAC.Phys, FireDAC.Phys.MSSQL, FireDAC.Phys.MSSQLDef, FireDAC.VCLUI.Wait, FireDAC.Stan.Param,
   FireDAC.DatS, FireDAC.DApt.Intf, FireDAC.DApt, FireDAC.Comp.DataSet, FireDAC.Comp.Client,
-  conexao.service, produto.model, produto.controller;
+  conexao.service, produto.model, produto.controller, produto.repository, produto.service;
 
 {$ENDREGION}
 
@@ -52,13 +52,8 @@ type
 
   private
     ValoresOriginais: array of string;
-    //TblProdutos: TFDQuery;
-    //QryProdutos: TFDQuery;
-    //QryTemp: TFDQuery;
-    //DsProdutos: TDataSource;
-    //TransacaoProdutos: TFDTransaction;
     FProduto: TProduto;
-    ProdutoController: TProdutoController;
+    FProdutoController: TProdutoController;
 
     procedure PreencherGrid;
     procedure CarregarCampos;
@@ -109,7 +104,7 @@ begin
   begin
     TConexao.GetInstance.Connection.InciarTransacao;
     FProduto := TProduto.Create;
-    ProdutoController := TProdutoController.Create;
+    FProdutoController := TProdutoController.Create(TProdutoRepository.Create, TProdutoService.Create);
     GetDataSource();
     FOperacao := opInicio;
     SetLength(ValoresOriginais, 3);
@@ -125,7 +120,7 @@ procedure TFrmCadProduto.FormShow(Sender: TObject);
 begin
   inherited;
   PreencherGrid();
-  DsProdutos := ProdutoController.GetDataSource();
+  DsProdutos := FProdutoController.GetDataSource();
   VerificaBotoes(FOperacao);
   if EdtPesquisar.CanFocus then
     EdtPesquisar.SetFocus;
@@ -133,19 +128,19 @@ end;
 
 function TFrmCadProduto.GetDataSource: TDataSource;
 begin
-   DBGridProdutos.DataSource := ProdutoController.GetDataSource();
+   DBGridProdutos.DataSource := FProdutoController.GetDataSource();
 end;
 
 procedure TFrmCadProduto.PreencherGrid;
 begin
-  ProdutoController.PreencherGrid(Trim(EdtPesquisar.Text) + '%', CbxFiltro.Text);
+  FProdutoController.PreencherGrid(Trim(EdtPesquisar.Text) + '%', CbxFiltro.Text);
   LblTotRegistros.Caption := 'Produtos: ' + InttoStr(DBGridProdutos.DataSource.DataSet.RecordCount);
 end;
 
 procedure TFrmCadProduto.CarregarCampos;
 begin
-  DsProdutos := ProdutoController.GetDataSource();
-  ProdutoController.CarregarCampos(FProduto, DsProdutos.DataSet.FieldByName('COD_PRODUTO').AsInteger);
+  DsProdutos := FProdutoController.GetDataSource();
+  FProdutoController.CarregarCampos(FProduto, DsProdutos.DataSet.FieldByName('COD_PRODUTO').AsInteger);
   with FProduto do
   begin
     EdtCodProduto.Text := IntToStr(Cod_Produto);
@@ -174,7 +169,7 @@ begin
     StringReplace(StringReplace(EdtPrecoUnitario.Text, '.', '', [rfReplaceAll]), ',', FormatSettings.DecimalSeparator, [rfReplaceAll]));
   end;
 
-  if ProdutoController.Inserir(FProduto, sErro) = false then
+  if FProdutoController.Inserir(FProduto, sErro) = false then
     raise Exception.Create(sErro)
   else
     MessageDlg('Produto incluido com sucesso !!', mtInformation, [mbOk], 0);
@@ -190,7 +185,7 @@ begin
     StringReplace(StringReplace(EdtPrecoUnitario.Text, '.', '', [rfReplaceAll]), ',', FormatSettings.DecimalSeparator, [rfReplaceAll]));
   end;
 
-  if ProdutoController.Alterar(FProduto, StrToInt(EdtCodProduto.Text), sErro) = False then
+  if FProdutoController.Alterar(FProduto, StrToInt(EdtCodProduto.Text), sErro) = False then
     raise Exception.Create(sErro)
   else
     MessageDlg('Produto alterado com sucesso !!', mtInformation, [mbOK], 0);
@@ -209,14 +204,14 @@ procedure TFrmCadProduto.Excluir;
 var sErro : String;
 begin
   if MessageDlg('Deseja realmente excluir o produto selecionado ?',mtConfirmation, [mbYes, mbNo],0) = IDYES then
-    if ProdutoController.Excluir(DsProdutos.DataSet.FieldByName('COD_PRODUTO').AsInteger, sErro) = False then
+    if FProdutoController.Excluir(DsProdutos.DataSet.FieldByName('COD_PRODUTO').AsInteger, sErro) = False then
       raise Exception.Create(sErro);
 end;
 
 function TFrmCadProduto.ValidarDados: Boolean;
 var LErro: TCampoInvalido;
 begin
-  Result := ProdutoController.ValidarDados(EdtDescricao.Text, EdtPrecoUnitario.Text, LErro);
+  Result := FProdutoController.ValidarDados(EdtDescricao.Text, EdtPrecoUnitario.Text, LErro);
   if not Result then
   begin
     MostrarMensagemErro(LErro);

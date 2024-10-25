@@ -10,8 +10,8 @@ uses
   Data.DB, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param, FireDAC.Stan.Error,
   FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Comp.DataSet, FireDAC.Comp.Client,
   Vcl.Grids, Vcl.DBGrids, Vcl.DBCtrls, conexao.service, produto.model, produto.controller,
-  cliente.model, cliente.controller, venda.model, vendaitens.model, venda.controller,
-  vendaitens.controller, untFormat, upesqvendas;
+  produto.repository, produto.service, cliente.model, cliente.controller, venda.model, vendaitens.model,
+  venda.controller, vendaitens.controller, untFormat, upesqvendas;
 {$ENDREGION}
 
 type
@@ -99,7 +99,7 @@ type
     DsVendas: TDataSource;
     TransacaoVendas: TFDTransaction;
     FProduto: TProduto;
-    ProdutoController: TProdutoController;
+    FProdutoController: TProdutoController;
     FCliente: TCliente;
     ClienteController: TClienteController;
     FVenda: TVenda;
@@ -226,7 +226,9 @@ begin
 
     //Instancias Classes
     FProduto := TProduto.Create;
-    ProdutoController := TProdutoController.Create;
+
+    // Instanciando o controller e injetando as dependências
+    FProdutoController := TProdutoController.Create(TProdutoRepository.Create, TProdutoService.Create);
     FCliente := TCliente.Create;
     ClienteController := TClienteController.Create;
     FVenda := TVenda.Create;
@@ -270,7 +272,7 @@ begin
   inherited;
   totVenda := 0;
   ClienteController.PreencherComboCliente();
-  ProdutoController.PreencherComboProduto();
+  FProdutoController.PreencherComboProduto();
 
   DbGridItensPedido.Columns[0].Width := 290;
   DbGridItensPedido.Columns[1].Width := 80;
@@ -856,7 +858,7 @@ procedure TFrmCadVenda.LCbxProdutosClick(Sender: TObject);
 var LPrecoUnitario: Double;
 begin
   inherited;
-  LPrecoUnitario := ProdutoController.GetValorUnitario(LCbxProdutos.KeyValue);
+  LPrecoUnitario := FProdutoController.GetValorUnitario(LCbxProdutos.KeyValue);
   EdtPrecoUnit.Text := FormatFloat('######0.00', LPrecoUnitario);
   EdtQuantidade.Text := '1';
   EdtQuantidade.SetFocus;
@@ -968,7 +970,7 @@ procedure TFrmCadVenda.BtnSairClick(Sender: TObject);
 begin
   inherited;
   FProduto.Free;
-  ProdutoController.Free;
+  FProdutoController.Free;
   FCliente.Free;
   ClienteController.Free;
   FVenda.Free;

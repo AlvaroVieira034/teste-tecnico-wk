@@ -2,8 +2,8 @@ unit produto.controller;
 
 interface
 
-uses produto.model, produto.repository, iproduto.repository, system.SysUtils, Vcl.Forms,
-     FireDAC.Comp.Client, Data.DB;
+uses produto.model, produto.repository, iproduto.repository, produto.service, iproduto.service, system.SysUtils,
+     Vcl.Forms, FireDAC.Comp.Client, Data.DB;
 
 type
   TCampoInvalido = (ciNome, ciDescricao, ciPreco, ciPrecoZero);
@@ -11,12 +11,12 @@ type
 
   private
     FProduto: TProduto;
-    FProdutoRepo: IProdutoRepository;
+    FProdutoRepository: IProdutoRepository;
+    FProdutoService: IProdutoService;
     FDataSource: TDataSource;
 
   public
-    //constructor Create(ARepository: IProdutoRepository);
-    constructor Create();
+    constructor Create(AProdutoRepository: IProdutoRepository; AProdutoService: IProdutoService);
     destructor Destroy; override;
     procedure PreencherGrid(APesquisa, ACampo: string);
     procedure PreencherComboProduto;
@@ -34,10 +34,11 @@ implementation
 
 { TProdutoController }
 
-constructor TProdutoController.Create;
+constructor TProdutoController.Create(AProdutoRepository: IProdutoRepository; AProdutoService: IProdutoService);
 begin
   FProduto := TProduto.Create();
-  FProdutoRepo := TProdutoRepository.Create;
+  FProdutoRepository := AProdutoRepository;
+  FProdutoService := AProdutoService;
 end;
 
 destructor TProdutoController.Destroy;
@@ -58,19 +59,19 @@ begin
   if ACampo = '' then
     LCampo := 'prd.des_descricao';
 
-  FProdutoRepo.PreencherGrid(APesquisa, LCampo);
+  FProdutoService.PreencherGrid(APesquisa, LCampo);
 end;
 
 procedure TProdutoController.PreencherComboProduto;
 begin
-  FProdutoRepo.PreencherComboProduto;
+  FProdutoService.PreencherComboProduto;
 end;
 
 function TProdutoController.CarregarCampos(FProduto: TProduto; iCodigo: Integer): Boolean;
 var sErro: string;
 begin
   try
-    FProdutoRepo.CarregarCampos(FProduto, iCodigo);
+    FProdutoService.CarregarCampos(FProduto, iCodigo);
   except on E: Exception do
     begin
       sErro := 'Ocorreu um erro ao carregar o produto!' + sLineBreak + E.Message;
@@ -82,22 +83,22 @@ end;
 
 function TProdutoController.Inserir(FProduto: TProduto; var sErro: string): Boolean;
 begin
-  Result := FProdutoRepo.Inserir(FProduto, sErro);
+  Result := FProdutoRepository.Inserir(FProduto, sErro);
 end;
 
 function TProdutoController.Alterar(FProduto: TProduto; iCodigo: Integer; sErro: string): Boolean;
 begin
-  Result := FProdutoRepo.Alterar(FProduto, iCodigo, sErro);
+  Result := FProdutoRepository.Alterar(FProduto, iCodigo, sErro);
 end;
 
 function TProdutoController.Excluir(iCodigo: Integer; var sErro: String): Boolean;
 begin
-  Result := FProdutoRepo.Excluir(iCodigo, sErro);
+  Result := FProdutoRepository.Excluir(iCodigo, sErro);
 end;
 
 function TProdutoController.GetValorUnitario(ACodigo: Integer): Double;
 begin
-  Result := FProdutoRepo.GetValorUnitario(ACodigo);
+  Result := FProdutoService.GetValorUnitario(ACodigo);
 end;
 
 function TProdutoController.ValidarDados(const ADescricao, APreco: string; out AErro: TCampoInvalido): Boolean;
@@ -127,7 +128,7 @@ end;
 
 function TProdutoController.GetDataSource: TDataSource;
 begin
-  Result := FProdutoRepo.GetDataSource;
+  Result := FProdutoService.GetDataSource;
 end;
 
 end.

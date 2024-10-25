@@ -17,16 +17,9 @@ type
   public
     constructor Create;
     destructor Destroy; override;
-    procedure PreencherGrid(APesquisa, ACampo: string);
-    procedure PreencherComboProduto;
-    procedure CarregarCampos(FProduto: TProduto; iCodigo: Integer);
     function Inserir(FProduto: TProduto; out sErro: string): Boolean;
     function Alterar(FProduto: TProduto; iCodigo: Integer; out sErro: string): Boolean;
     function Excluir(iCodigo: Integer; out sErro : string): Boolean;
-    function GetValorUnitario(ACodigo: Integer): Double;
-    function GetDataSource: TDataSource;
-    procedure CriarTabelas;
-    procedure CriarCamposTabelas;
 
   end;
 
@@ -38,99 +31,15 @@ implementation
 constructor TProdutoRepository.Create;
 begin
   inherited Create;
-  CriarTabelas();
-  CriarCamposTabelas();
+  Transacao := TConexao.GetInstance.Connection.CriarTransaction;
+  QryProdutos := TConexao.GetInstance.Connection.CriarQuery;
+  QryProdutos.Transaction := Transacao;
 end;
 
 destructor TProdutoRepository.Destroy;
 begin
-
+  QryProdutos.Free;
   inherited Destroy;
-end;
-
-procedure TProdutoRepository.CriarTabelas;
-begin
-  Transacao := TConexao.GetInstance.Connection.CriarTransaction;
-  TblProdutos := TConexao.GetInstance.Connection.CriarQuery;
-  QryProdutos := TConexao.GetInstance.Connection.CriarQuery;
-  QryProdutos.Transaction := Transacao;
-  DsProdutos := TConexao.GetInstance.Connection.CriarDataSource;
-  DsProdutos.DataSet := TblProdutos;
-end;
-
-procedure TProdutoRepository.CriarCamposTabelas;
-var
-  FloatField: TFloatField;
-  StringField: TStringField;
-  DateField: TDateField;
-  IntegerField: TIntegerField;
-begin
-  // Criando o campo COD_PRODUTO
-  IntegerField := TIntegerField.Create(TblProdutos);
-  IntegerField.FieldName := 'COD_PRODUTO';
-  IntegerField.DataSet := TblProdutos;
-  IntegerField.Name := 'TblProdutosCOD_PRODUTO';
-
-  // Criando o campo NOME_PRODUTO
-  StringField := TStringField.Create(TblProdutos);
-  StringField.FieldName := 'DES_DESCRICAO';
-  StringField.Size := 100;
-  StringField.DataSet := TblProdutos;
-  StringField.Name := 'TblProdutosDES_DESCRICAO';
-
-  // Criando o campo VAL_PRECO
-  FloatField := TFloatField.Create(TblProdutos);
-  FloatField.FieldName := 'VAL_PRECO';
-  FloatField.DataSet := TblProdutos;
-  FloatField.Name := 'TblProdutosVAL_PRECO';
-  FloatField.DisplayFormat := '#,###,##0.00';
-end;
-
-procedure TProdutoRepository.PreencherGrid(APesquisa, ACampo: string);
-begin
-  with TblProdutos do
-  begin
-    Close;
-    SQL.Clear;
-    SQL.Add('select prd.cod_produto, ');
-    SQL.Add('prd.des_descricao, ');
-    SQL.Add('prd.val_preco ');
-    SQL.Add('from tab_produto prd');
-    SQL.Add('where ' + ACampo + ' like :pNOME');
-    SQL.Add('order by ' + ACampo);
-    ParamByName('PNOME').AsString := APesquisa;
-    Open();
-  end;
-end;
-
-procedure TProdutoRepository.PreencherComboProduto;
-begin
-  with TblProdutos do
-  begin
-    Close;
-    SQL.Clear;
-    SQL.Add('select * from tab_produto prd order by prd.des_descricao ');
-    Open();
-  end;
-end;
-
-procedure TProdutoRepository.CarregarCampos(FProduto: TProduto; iCodigo: Integer);
-begin
-  with TblProdutos do
-  begin
-    SQL.Clear;
-    SQL.Add('select prd.cod_produto');
-    SQL.Add(',prd.des_descricao');
-    SQL.Add(',prd.val_preco');
-    SQL.Add('from tab_produto prd');
-    SQL.Add('where cod_produto = :cod_produto');
-    ParamByName('cod_produto').AsInteger := iCodigo;
-    Open;
-
-    FProduto.Cod_Produto := FieldByName('COD_PRODUTO').AsInteger;
-    FProduto.Des_Descricao := FieldByName('DES_DESCRICAO').AsString;
-    FProduto.Val_Preco := FieldByName('VAL_PRECO').AsFloat;
-  end;
 end;
 
 function TProdutoRepository.Inserir(FProduto: TProduto; out sErro: string): Boolean;
@@ -237,27 +146,6 @@ begin
       end;
     end;
   end;
-end;
-
-function TProdutoRepository.GetValorUnitario(ACodigo: Integer): Double;
-begin
-  Result := 0;
-  with QryTemp do
-  begin
-    SQL.Clear;
-    SQL.Add('select cod_produto, ');
-    SQL.Add('val_preco');
-    SQL.Add('from tab_produto');
-    SQL.Add('where cod_produto = :cod_produto');
-    ParamByName('COD_PRODUTO').AsInteger := ACodigo;
-    Open;
-    Result := FieldByName('val_preco').AsFloat
-  end;
-end;
-
-function TProdutoRepository.GetDataSource: TDataSource;
-begin
-  Result := DsProdutos;
 end;
 
 end.

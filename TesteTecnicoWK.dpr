@@ -24,7 +24,9 @@ uses
   cliente.repository in 'repository\cliente.repository.pas',
   produto.repository in 'repository\produto.repository.pas',
   venda.repository in 'repository\venda.repository.pas',
-  vendaitens.repository in 'repository\vendaitens.repository.pas';
+  vendaitens.repository in 'repository\vendaitens.repository.pas',
+  produto.service in 'service\produto\produto.service.pas',
+  iproduto.service in 'interface\iproduto.service.pas';
 
 {$R *.res}
 
