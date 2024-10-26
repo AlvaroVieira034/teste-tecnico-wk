@@ -15,9 +15,9 @@ type
   public
     constructor Create;
     destructor Destroy; override;
-    procedure PreencherGrid(APesquisa, ACampo: string);
-    procedure PreencherComboProduto;
-    procedure CarregarCampos(FProduto: TProduto; iCodigo: Integer);
+    procedure PreencherGridProdutos(APesquisa, ACampo: string);
+    procedure PreencherComboProdutos;
+    procedure PreencherCamposForm(FProduto: TProduto; iCodigo: Integer);
     function GetValorUnitario(ACodigo: Integer): Double;
     function GetDataSource: TDataSource;
     procedure CriarTabelas;
@@ -80,7 +80,7 @@ begin
 
 end;
 
-procedure TProdutoService.PreencherGrid(APesquisa, ACampo: string);
+procedure TProdutoService.PreencherGridProdutos(APesquisa, ACampo: string);
 begin
   with TblProdutos do
   begin
@@ -97,9 +97,9 @@ begin
   end;
 end;
 
-procedure TProdutoService.PreencherComboProduto;
+procedure TProdutoService.PreencherComboProdutos;
 begin
-   with TblProdutos do
+  with TblProdutos do
   begin
     Close;
     SQL.Clear;
@@ -108,7 +108,7 @@ begin
   end;
 end;
 
-procedure TProdutoService.CarregarCampos(FProduto: TProduto; iCodigo: Integer);
+procedure TProdutoService.PreencherCamposForm(FProduto: TProduto; iCodigo: Integer);
 begin
   with TblProdutos do
   begin
@@ -147,8 +147,6 @@ function TProdutoService.GetDataSource: TDataSource;
 begin
   Result := DsProdutos;
 end;
-
-
 
 
 end.

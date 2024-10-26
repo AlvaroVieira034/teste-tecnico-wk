@@ -8,10 +8,7 @@ uses iproduto.repository, produto.model, conexao.service, System.SysUtils, FireD
 type
   TProdutoRepository = class(TInterfacedObject, IProdutoRepository)
   private
-    TblProdutos: TFDQuery;
     QryProdutos: TFDQuery;
-    QryTemp: TFDQuery;
-    DsProdutos: TDataSource;
     Transacao: TFDTransaction;
 
   public
@@ -20,6 +17,7 @@ type
     function Inserir(FProduto: TProduto; out sErro: string): Boolean;
     function Alterar(FProduto: TProduto; iCodigo: Integer; out sErro: string): Boolean;
     function Excluir(iCodigo: Integer; out sErro : string): Boolean;
+    function ExecutarTransacao(AOperacao: TProc; var sErro: string): Boolean;
 
   end;
 
@@ -44,96 +42,76 @@ end;
 
 function TProdutoRepository.Inserir(FProduto: TProduto; out sErro: string): Boolean;
 begin
-  with QryProdutos, FProduto do
-  begin
-    Close;
-    SQL.Clear;
-    SQL.Add('insert into tab_produto(');
-    SQL.Add('des_descricao, ');
-    SQL.Add('val_preco) ');
-    SQL.Add('values (:des_descricao, ');
-    SQL.Add(':val_preco)');
-
-    ParamByName('DES_DESCRICAO').AsString := Des_Descricao;
-    ParamByName('VAL_PRECO').AsFloat := Val_Preco;
-
-    // Inicia Transação
-    if not Transacao.Connection.Connected then
-      Transacao.Connection.Open();
-
-    try
-      Prepared := True;
-      Transacao.StartTransaction;
-      ExecSQL;
-      Transacao.Commit;
-      Result := True;
-    except
-      on E: Exception do
+  Result := ExecutarTransacao(
+    procedure
+    begin
+      with QryProdutos, FProduto do
       begin
-        Transacao.Rollback;
-        sErro := 'Ocorreu um erro ao inserir um novo produto!' + sLineBreak + E.Message;
-        Result := False;
-        raise;
+        Close;
+        SQL.Clear;
+        SQL.Add('insert into tab_produto(');
+        SQL.Add('des_descricao, ');
+        SQL.Add('val_preco) ');
+        SQL.Add('values (:des_descricao, ');
+        SQL.Add(':val_preco)');
+
+        ParamByName('DES_DESCRICAO').AsString := Des_Descricao;
+        ParamByName('VAL_PRECO').AsFloat := Val_Preco;
+
+        ExecSQL;
       end;
-    end;
-  end;
+    end, sErro);
 end;
 
 function TProdutoRepository.Alterar(FProduto: TProduto; iCodigo: Integer; out sErro: string): Boolean;
 begin
-  with QryProdutos, FProduto do
+  Result := ExecutarTransacao(
+  procedure
   begin
-    Result := False;
-    Close;
-    SQL.Clear;
-    SQL.Add('update tab_produto set ');
-    SQL.Add('des_descricao = :des_descricao, ');
-    SQL.Add('val_preco = :val_preco');
-    SQL.Add('where cod_produto = :cod_produto');
+    with QryProdutos, FProduto do
+    begin
+      Close;
+      SQL.Clear;
+      SQL.Add('update tab_produto set ');
+      SQL.Add('des_descricao = :des_descricao, ');
+      SQL.Add('val_preco = :val_preco');
+      SQL.Add('where cod_produto = :cod_produto');
 
-    ParamByName('DES_DESCRICAO').AsString := Des_Descricao;
-    ParamByName('VAL_PRECO').AsFloat := Val_Preco;
-    ParamByName('COD_PRODUTO').AsInteger := iCodigo;
+      ParamByName('DES_DESCRICAO').AsString := Des_Descricao;
+      ParamByName('VAL_PRECO').AsFloat := Val_Preco;
+      ParamByName('COD_PRODUTO').AsInteger := iCodigo;
 
-    // Inicia Transação
-    if not Transacao.Connection.Connected then
-      Transacao.Connection.Open();
-
-    try
-      Prepared := True;
-      Transacao.StartTransaction;
       ExecSQL;
-      Transacao.Commit;
-      Result := True;
-    except
-      on E: Exception do
-      begin
-        Transacao.Rollback;
-        sErro := 'Ocorreu um erro ao alterar os dados do produto!' + sLineBreak + E.Message;
-        Result := False;
-        raise;
-      end;
     end;
-  end;
+  end, sErro);
 end;
 
 function TProdutoRepository.Excluir(iCodigo: Integer; out sErro: string): Boolean;
 begin
-  with QryProdutos do
+  Result := ExecutarTransacao(
+  procedure
   begin
-    Close;
-    SQL.Clear;
-    SQL.Text := 'delete from tab_produto where cod_produto = :cod_produto';
-    ParamByName('COD_PRODUTO').AsInteger := iCodigo;
+    with QryProdutos do
+    begin
+      Close;
+      SQL.Clear;
+      SQL.Text := 'delete from tab_produto where cod_produto = :cod_produto';
+      ParamByName('COD_PRODUTO').AsInteger := iCodigo;
 
-    // Inicia Transação
-    if not Transacao.Connection.Connected then
-      Transacao.Connection.Open();
-
-    try
-      Prepared := True;
-      Transacao.StartTransaction;
       ExecSQL;
+    end;
+  end, sErro);
+end;
+
+function TProdutoRepository.ExecutarTransacao(AOperacao: TProc; var sErro: string): Boolean;
+begin
+  Result := False;
+  if not Transacao.Connection.Connected then
+    Transacao.Connection.Open();
+  try
+    Transacao.StartTransaction;
+    try
+      AOperacao;
       Transacao.Commit;
       Result := True;
     except
@@ -141,9 +119,14 @@ begin
       begin
         Transacao.Rollback;
         sErro := 'Ocorreu um erro ao excluir o produto !' + sLineBreak + E.Message;
-        Result := False;
         raise;
       end;
+    end;
+  except
+    on E: Exception do
+    begin
+      sErro := 'Erro na conexão com o banco de dados: ' + sLineBreak + E.Message;
+      Result := False;
     end;
   end;
 end;

@@ -15,9 +15,11 @@ type
     BtnProdutos: TSpeedButton;
     Timer1: TTimer;
     ImageList: TImageList;
+    BtnClientes: TSpeedButton;
     procedure BtnSairClick(Sender: TObject);
     procedure BtnProdutosClick(Sender: TObject);
     procedure BtnVendasClick(Sender: TObject);
+    procedure BtnClientesClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -31,7 +33,17 @@ implementation
 
 {$R *.dfm}
 
-uses ucadproduto, ucadvenda;
+uses ucadproduto, ucadvenda, ucadcliente;
+
+procedure TFrmMain.BtnClientesClick(Sender: TObject);
+begin
+  if not Assigned(FrmCadCliente) then
+    FrmCadCliente := TFrmCadCliente.Create(Self);
+
+  FrmCadCliente.ShowModal;
+  FrmCadCliente.Free;
+  FrmCadCliente := nil;
+end;
 
 procedure TFrmMain.BtnProdutosClick(Sender: TObject);
 begin

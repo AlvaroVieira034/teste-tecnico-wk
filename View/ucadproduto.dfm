@@ -171,6 +171,7 @@ inherited FrmCadProduto: TFrmCadProduto
         TitleFont.Height = -11
         TitleFont.Name = 'Tahoma'
         TitleFont.Style = []
+        OnCellClick = DBGridProdutosCellClick
         OnDblClick = DBGridProdutosDblClick
         OnKeyDown = DBGridProdutosKeyDown
         Columns = <

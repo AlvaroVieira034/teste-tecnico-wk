@@ -93,25 +93,20 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="View\umain.pas">
+        <DCCReference Include="view\umain.pas">
             <Form>FrmMain</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="View\ucadastropadrao.pas">
+        <DCCReference Include="view\ucadastropadrao.pas">
             <Form>FrmCadastroPadrao</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="View\ucadproduto.pas">
+        <DCCReference Include="view\ucadproduto.pas">
             <Form>FrmCadProduto</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="View\ucadvenda.pas">
+        <DCCReference Include="view\ucadvenda.pas">
             <Form>FrmCadVenda</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="View\upesqvendas.pas">
+        <DCCReference Include="view\upesqvendas.pas">
             <Form>FrmPesquisaVendas</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="controller\cliente.controller.pas"/>
         <DCCReference Include="controller\produto.controller.pas"/>
@@ -133,6 +128,16 @@
         <DCCReference Include="repository\vendaitens.repository.pas"/>
         <DCCReference Include="service\produto\produto.service.pas"/>
         <DCCReference Include="interface\iproduto.service.pas"/>
+        <DCCReference Include="interface\icliente.service.pas"/>
+        <DCCReference Include="service\cliente\cliente.service.pas"/>
+        <DCCReference Include="interface\ivenda.service.pas"/>
+        <DCCReference Include="interface\ivenda.repository.pas"/>
+        <DCCReference Include="service\venda\venda.service.pas"/>
+        <DCCReference Include="view\ucadcliente.pas">
+            <Form>FrmCadCliente</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="util\lib\biblioteca.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -167,27 +172,12 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployClass Name="DependencyModule">
-                    <Platform Name="Win32">
-                        <Operation>0</Operation>
-                        <Extensions>.dll;.bpl</Extensions>
-                    </Platform>
+                <DeployClass Name="ProjectiOSDeviceResourceRules">
                     <Platform Name="iOSDevice64">
                         <Operation>1</Operation>
-                        <Extensions>.dylib</Extensions>
-                    </Platform>
-                    <Platform Name="OSX32">
-                        <RemoteDir>Contents\MacOS</RemoteDir>
-                        <Operation>1</Operation>
-                        <Extensions>.dylib</Extensions>
                     </Platform>
                     <Platform Name="iOSDevice32">
                         <Operation>1</Operation>
-                        <Extensions>.dylib</Extensions>
-                    </Platform>
-                    <Platform Name="iOSSimulator">
-                        <Operation>1</Operation>
-                        <Extensions>.dylib</Extensions>
                     </Platform>
                 </DeployClass>
                 <DeployClass Name="ProjectOSXResource">
@@ -567,12 +557,27 @@
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
-                <DeployClass Name="ProjectiOSDeviceResourceRules">
+                <DeployClass Name="DependencyModule">
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                        <Extensions>.dll;.bpl</Extensions>
+                    </Platform>
                     <Platform Name="iOSDevice64">
                         <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="OSX32">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
                     </Platform>
                     <Platform Name="iOSDevice32">
                         <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
                     </Platform>
                 </DeployClass>
                 <ProjectRoot Platform="iOSDevice64" Name="$(PROJECTNAME).app"/>

@@ -18,21 +18,23 @@ type
   public
     constructor Create(AProdutoRepository: IProdutoRepository; AProdutoService: IProdutoService);
     destructor Destroy; override;
-    procedure PreencherGrid(APesquisa, ACampo: string);
-    procedure PreencherComboProduto;
-    function CarregarCampos(FProduto: TProduto; iCodigo: Integer): Boolean;
+    procedure PreencherGridProdutos(APesquisa, ACampo: string);
+    procedure PreencherComboProdutos;
+    function PreencherCamposForm(FProduto: TProduto; iCodigo: Integer): Boolean;
     function Inserir(FProduto: TProduto; var sErro: string): Boolean;
     function Alterar(FProduto: TProduto; iCodigo: Integer; sErro: string): Boolean;
     function Excluir(iCodigo: Integer; var sErro: string): Boolean;
-    function ValidarDados(const ADescricao, APreco: string; out AErro: TCampoInvalido): Boolean;
     function GetValorUnitario(ACodigo: Integer): Double;
     function GetDataSource: TDataSource;
+    function ValidarDados(const ADescricao, APreco: string; out AErro: TCampoInvalido): Boolean;
+    function ExecutarTransacao(AOperacao: TProc; var sErro: string): Boolean;
 
   end;
 
 implementation
 
 { TProdutoController }
+
 
 constructor TProdutoController.Create(AProdutoRepository: IProdutoRepository; AProdutoService: IProdutoService);
 begin
@@ -47,7 +49,7 @@ begin
   inherited;
 end;
 
-procedure TProdutoController.PreencherGrid(APesquisa, ACampo: string);
+procedure TProdutoController.PreencherGridProdutos(APesquisa, ACampo: string);
 var LCampo, sErro: string;
 begin
   if ACampo = 'Código' then
@@ -59,19 +61,19 @@ begin
   if ACampo = '' then
     LCampo := 'prd.des_descricao';
 
-  FProdutoService.PreencherGrid(APesquisa, LCampo);
+  FProdutoService.PreencherGridProdutos(APesquisa, LCampo);
 end;
 
-procedure TProdutoController.PreencherComboProduto;
+procedure TProdutoController.PreencherComboProdutos;
 begin
-  FProdutoService.PreencherComboProduto;
+  FProdutoService.PreencherComboProdutos;
 end;
 
-function TProdutoController.CarregarCampos(FProduto: TProduto; iCodigo: Integer): Boolean;
+function TProdutoController.PreencherCamposForm(FProduto: TProduto; iCodigo: Integer): Boolean;
 var sErro: string;
 begin
   try
-    FProdutoService.CarregarCampos(FProduto, iCodigo);
+    FProdutoService.PreencherCamposForm(FProduto, iCodigo);
   except on E: Exception do
     begin
       sErro := 'Ocorreu um erro ao carregar o produto!' + sLineBreak + E.Message;
@@ -101,6 +103,16 @@ begin
   Result := FProdutoService.GetValorUnitario(ACodigo);
 end;
 
+function TProdutoController.GetDataSource: TDataSource;
+begin
+  Result := FProdutoService.GetDataSource;
+end;
+
+function TProdutoController.ExecutarTransacao(AOperacao: TProc; var sErro: string): Boolean;
+begin
+  Result := FProdutoRepository.ExecutarTransacao(AOperacao, sErro);
+end;
+
 function TProdutoController.ValidarDados(const ADescricao, APreco: string; out AErro: TCampoInvalido): Boolean;
 begin
   Result := True;
@@ -124,11 +136,6 @@ begin
     Result := False;
     Exit;
   end;
-end;
-
-function TProdutoController.GetDataSource: TDataSource;
-begin
-  Result := FProdutoService.GetDataSource;
 end;
 
 end.

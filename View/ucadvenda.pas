@@ -11,7 +11,7 @@ uses
   FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Comp.DataSet, FireDAC.Comp.Client,
   Vcl.Grids, Vcl.DBGrids, Vcl.DBCtrls, conexao.service, produto.model, produto.controller,
   produto.repository, produto.service, cliente.model, cliente.controller, venda.model, vendaitens.model,
-  venda.controller, vendaitens.controller, untFormat, upesqvendas;
+  venda.controller, vendaitens.controller, cliente.repository, cliente.service, untFormat, upesqvendas;
 {$ENDREGION}
 
 type
@@ -155,27 +155,6 @@ begin
   QryTemp := TFDQuery.Create(nil);
 end;
 
-procedure TFrmCadVenda.DbGridItensPedidoKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-begin
-  inherited;
-  if Key = VK_RETURN then
-  begin
-    LCbxProdutos.KeyValue := MTblVendaItemCOD_PRODUTO.AsInteger;
-    EdtQuantidade.Text := IntToStr(MTblVendaItemVAL_QUANTIDADE.AsInteger);
-    EdtPrecoUnit.Text := FloatToStr(MTblVendaItemVAL_PRECOUNITARIO.AsFloat);
-    EdtPrecoTotal.Text := FloatToStr(MTblVendaItemVAL_TOTALITEM.AsFloat);
-    alterouGrid := True;
-    idItem := MTblVendaItemID_VENDA.AsInteger;
-    totVendaAnt := MTblVendaItemVAL_TOTALITEM.AsFloat;
-    Key := 0;
-  end;
-
-  if Key = VK_DELETE then
-  begin
-   BtnDelItemGridClick(Sender);
-  end;
-end;
-
 destructor TFrmCadVenda.Destroy;
 begin
   TransacaoVendas.Free;
@@ -230,7 +209,7 @@ begin
     // Instanciando o controller e injetando as dependências
     FProdutoController := TProdutoController.Create(TProdutoRepository.Create, TProdutoService.Create);
     FCliente := TCliente.Create;
-    ClienteController := TClienteController.Create;
+    ClienteController := TClienteController.Create(TClienteRepository.Create, TClienteService.Create);
     FVenda := TVenda.Create;
     VendaController := TVendaController.Create;
     FVendaItens := TVendaItens.Create;
@@ -271,8 +250,8 @@ procedure TFrmCadVenda.FormShow(Sender: TObject);
 begin
   inherited;
   totVenda := 0;
-  ClienteController.PreencherComboCliente();
-  FProdutoController.PreencherComboProduto();
+  ClienteController.PreencherComboClientes();
+  FProdutoController.PreencherComboProdutos();
 
   DbGridItensPedido.Columns[0].Width := 290;
   DbGridItensPedido.Columns[1].Width := 80;
@@ -937,6 +916,27 @@ begin
 
   LValorItem := (StrToInt(EdtQuantidade.Text) * StrToFloat(EdtPrecoUnit.Text));
   EdtPrecoTotal.Text := FormatFloat('#0.00', LValorItem);
+end;
+
+procedure TFrmCadVenda.DbGridItensPedidoKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  inherited;
+  if Key = VK_RETURN then
+  begin
+    LCbxProdutos.KeyValue := MTblVendaItemCOD_PRODUTO.AsInteger;
+    EdtQuantidade.Text := IntToStr(MTblVendaItemVAL_QUANTIDADE.AsInteger);
+    EdtPrecoUnit.Text := FloatToStr(MTblVendaItemVAL_PRECOUNITARIO.AsFloat);
+    EdtPrecoTotal.Text := FloatToStr(MTblVendaItemVAL_TOTALITEM.AsFloat);
+    alterouGrid := True;
+    idItem := MTblVendaItemID_VENDA.AsInteger;
+    totVendaAnt := MTblVendaItemVAL_TOTALITEM.AsFloat;
+    Key := 0;
+  end;
+
+  if Key = VK_DELETE then
+  begin
+   BtnDelItemGridClick(Sender);
+  end;
 end;
 
 procedure TFrmCadVenda.EdtCodClienteKeyPress(Sender: TObject; var Key: Char);

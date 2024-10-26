@@ -2,11 +2,11 @@ program TesteTecnicoWK;
 
 uses
   Vcl.Forms,
-  umain in 'View\umain.pas' {FrmMain},
-  ucadastropadrao in 'View\ucadastropadrao.pas' {FrmCadastroPadrao},
-  ucadproduto in 'View\ucadproduto.pas' {FrmCadProduto},
-  ucadvenda in 'View\ucadvenda.pas' {FrmCadVenda},
-  upesqvendas in 'View\upesqvendas.pas' {FrmPesquisaVendas},
+  umain in 'view\umain.pas' {FrmMain},
+  ucadastropadrao in 'view\ucadastropadrao.pas' {FrmCadastroPadrao},
+  ucadproduto in 'view\ucadproduto.pas' {FrmCadProduto},
+  ucadvenda in 'view\ucadvenda.pas' {FrmCadVenda},
+  upesqvendas in 'view\upesqvendas.pas' {FrmPesquisaVendas},
   cliente.controller in 'controller\cliente.controller.pas',
   produto.controller in 'controller\produto.controller.pas',
   venda.controller in 'controller\venda.controller.pas',
@@ -26,7 +26,14 @@ uses
   venda.repository in 'repository\venda.repository.pas',
   vendaitens.repository in 'repository\vendaitens.repository.pas',
   produto.service in 'service\produto\produto.service.pas',
-  iproduto.service in 'interface\iproduto.service.pas';
+  iproduto.service in 'interface\iproduto.service.pas',
+  icliente.service in 'interface\icliente.service.pas',
+  cliente.service in 'service\cliente\cliente.service.pas',
+  ivenda.service in 'interface\ivenda.service.pas',
+  ivenda.repository in 'interface\ivenda.repository.pas',
+  venda.service in 'service\venda\venda.service.pas',
+  ucadcliente in 'view\ucadcliente.pas' {FrmCadCliente},
+  biblioteca in 'util\lib\biblioteca.pas';
 
 {$R *.res}
 

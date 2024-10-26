@@ -49,33 +49,33 @@ type
     procedure BtnPesquisarClick(Sender: TObject);
     procedure DBGridProdutosKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure DBGridProdutosCellClick(Column: TColumn);
 
   private
     ValoresOriginais: array of string;
     FProduto: TProduto;
     FProdutoController: TProdutoController;
 
-    procedure PreencherGrid;
-    procedure CarregarCampos;
-    procedure Inserir;
-    procedure Alterar;
-    procedure Excluir;
-    function ValidarDados: Boolean;
-    procedure GravarDados;
-    procedure LimpaCampos(AOperacao: TOperacao);
+    procedure PreencherGridProdutos;
+    procedure PreencherCamposForm;
+    function GravarDados: Boolean;
+    procedure LimpaCamposForm(AOperacao: TOperacao);
     procedure VerificaBotoes(AOperacao: TOperacao);
     procedure MostrarMensagemErro(AErro: TCampoInvalido);
     function GetDataSource: TDataSource;
+    function ValidarDados: Boolean;
 
   public
     FOperacao: TOperacao;
     DsProdutos: TDataSource;
+
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
   end;
 
 var
   FrmCadProduto: TFrmCadProduto;
+  sErro : string;
 
 implementation
 
@@ -102,7 +102,6 @@ begin
   inherited;
   if TConexao.GetInstance.Connection.TestarConexao then
   begin
-    TConexao.GetInstance.Connection.InciarTransacao;
     FProduto := TProduto.Create;
     FProdutoController := TProdutoController.Create(TProdutoRepository.Create, TProdutoService.Create);
     GetDataSource();
@@ -119,28 +118,24 @@ end;
 procedure TFrmCadProduto.FormShow(Sender: TObject);
 begin
   inherited;
-  PreencherGrid();
+  PreencherGridProdutos();
   DsProdutos := FProdutoController.GetDataSource();
   VerificaBotoes(FOperacao);
   if EdtPesquisar.CanFocus then
     EdtPesquisar.SetFocus;
+
 end;
 
-function TFrmCadProduto.GetDataSource: TDataSource;
+procedure TFrmCadProduto.PreencherGridProdutos;
 begin
-   DBGridProdutos.DataSource := FProdutoController.GetDataSource();
-end;
-
-procedure TFrmCadProduto.PreencherGrid;
-begin
-  FProdutoController.PreencherGrid(Trim(EdtPesquisar.Text) + '%', CbxFiltro.Text);
+  FProdutoController.PreencherGridProdutos(Trim(EdtPesquisar.Text) + '%', CbxFiltro.Text);
   LblTotRegistros.Caption := 'Produtos: ' + InttoStr(DBGridProdutos.DataSource.DataSet.RecordCount);
 end;
 
-procedure TFrmCadProduto.CarregarCampos;
+procedure TFrmCadProduto.PreencherCamposForm;
 begin
   DsProdutos := FProdutoController.GetDataSource();
-  FProdutoController.CarregarCampos(FProduto, DsProdutos.DataSet.FieldByName('COD_PRODUTO').AsInteger);
+  FProdutoController.PreencherCamposForm(FProduto, DsProdutos.DataSet.FieldByName('COD_PRODUTO').AsInteger);
   with FProduto do
   begin
     EdtCodProduto.Text := IntToStr(Cod_Produto);
@@ -153,85 +148,65 @@ begin
   BtnPesquisar.Click;
 end;
 
-procedure TFrmCadProduto.CbxFiltroClick(Sender: TObject);
-begin
-  inherited;
-  BtnPesquisar.Click;
-end;
-
-procedure TFrmCadProduto.Inserir;
-var sErro: string;
-begin
-  with FProduto do
-  begin
-    Des_Descricao := EdtDescricao.Text;
-    Val_Preco := StrToFloat(
-    StringReplace(StringReplace(EdtPrecoUnitario.Text, '.', '', [rfReplaceAll]), ',', FormatSettings.DecimalSeparator, [rfReplaceAll]));
-  end;
-
-  if FProdutoController.Inserir(FProduto, sErro) = false then
-    raise Exception.Create(sErro)
-  else
-    MessageDlg('Produto incluido com sucesso !!', mtInformation, [mbOk], 0);
-end;
-
-procedure TFrmCadProduto.Alterar;
-var sErro: String;
-begin
-  with FProduto do
-  begin
-    Des_Descricao := EdtDescricao.Text;
-    Val_Preco := StrToFloat(
-    StringReplace(StringReplace(EdtPrecoUnitario.Text, '.', '', [rfReplaceAll]), ',', FormatSettings.DecimalSeparator, [rfReplaceAll]));
-  end;
-
-  if FProdutoController.Alterar(FProduto, StrToInt(EdtCodProduto.Text), sErro) = False then
-    raise Exception.Create(sErro)
-  else
-    MessageDlg('Produto alterado com sucesso !!', mtInformation, [mbOK], 0);
-end;
-
 procedure TFrmCadProduto.EdtPrecoUnitarioExit(Sender: TObject);
 var LValor: Double;
 begin
   inherited;
   if TryStrToFloat(EdtPrecoUnitario.Text, LValor) then
     EdtPrecoUnitario.Text := FormatFloat('#,###,##0.00', LValor)
-
 end;
 
-procedure TFrmCadProduto.Excluir;
-var sErro : String;
+procedure TFrmCadProduto.CbxFiltroClick(Sender: TObject);
 begin
-  if MessageDlg('Deseja realmente excluir o produto selecionado ?',mtConfirmation, [mbYes, mbNo],0) = IDYES then
-    if FProdutoController.Excluir(DsProdutos.DataSet.FieldByName('COD_PRODUTO').AsInteger, sErro) = False then
-      raise Exception.Create(sErro);
+  inherited;
+  BtnPesquisar.Click;
 end;
 
-function TFrmCadProduto.ValidarDados: Boolean;
-var LErro: TCampoInvalido;
+function TFrmCadProduto.GravarDados: Boolean;
 begin
-  Result := FProdutoController.ValidarDados(EdtDescricao.Text, EdtPrecoUnitario.Text, LErro);
-  if not Result then
+  Result := False;
+  if not ValidarDados then
+    Exit;
+
+  with FProduto do
   begin
-    MostrarMensagemErro(LErro);
-    Exit(False);
+    Des_Descricao := EdtDescricao.Text;
+    Val_Preco := StrToFloat(
+    StringReplace(StringReplace(EdtPrecoUnitario.Text, '.', '', [rfReplaceAll]), ',', FormatSettings.DecimalSeparator, [rfReplaceAll]));
+  end;
+
+  case FOperacao of
+    opNovo:
+    begin
+      if FProdutoController.ExecutarTransacao(
+        procedure
+        begin
+          FProdutoController.Inserir(FProduto, sErro);
+        end, sErro) then
+        MessageDlg('Produto incluído com sucesso!', mtInformation, [mbOk], 0)
+      else
+        raise Exception.Create(sErro);
+    end;
+
+    opEditar:
+    begin
+      if FProdutoController.ExecutarTransacao(
+        procedure
+        begin
+          FProdutoController.Alterar(FProduto, StrToInt(EdtCodProduto.Text), sErro);
+        end, sErro) then
+        MessageDlg('Produto alterado com sucesso!', mtInformation, [mbOk], 0)
+      else
+        raise Exception.Create(sErro);
+    end;
   end;
 
   Result := True;
-end;
-
-procedure TFrmCadProduto.GravarDados;
-begin
-  case FOperacao of
-    opNovo    : Inserir();
-    opEditar  : Alterar();
-  end;
   DsProdutos.DataSet.Refresh;
-  FOperacao := opNavegar
+  FOperacao := opNavegar;
 end;
 
-procedure TFrmCadProduto.LimpaCampos(AOperacao: TOperacao);
+procedure TFrmCadProduto.LimpaCamposForm(AOperacao: TOperacao);
 begin
   EdtCodProduto.Text := '';
   EdtDescricao.Text := '';
@@ -257,23 +232,31 @@ procedure TFrmCadProduto.MostrarMensagemErro(AErro: TCampoInvalido);
 begin
   case AErro of
     ciDescricao:
-      begin
-        MessageDlg('A descrição do produto deve ser informada!', mtInformation, [mbOK], 0);
-        EdtDescricao.SetFocus;
-      end;
+    begin
+      MessageDlg('A descrição do produto deve ser informada!', mtInformation, [mbOK], 0);
+      EdtDescricao.SetFocus;
+    end;
+
     ciPreco, ciPrecoZero:
-      begin
-        MessageDlg('O preço unitário deve ser maior que 0!', mtInformation, [mbOK], 0);
-        EdtPrecoUnitario.SetFocus;
-      end;
+    begin
+      MessageDlg('O preço unitário deve ser maior que 0!', mtInformation, [mbOK], 0);
+      EdtPrecoUnitario.SetFocus;
+    end;
   end;
+end;
+
+procedure TFrmCadProduto.DBGridProdutosCellClick(Column: TColumn);
+begin
+  inherited;
+  FOperacao := opNavegar;
+  VerificaBotoes(FOperacao);
 end;
 
 procedure TFrmCadProduto.DBGridProdutosDblClick(Sender: TObject);
 begin
   inherited;
   FOperacao := opNavegar;
-  CarregarCampos;
+  PreencherCamposForm;
   VerificaBotoes(FOperacao);
 end;
 
@@ -282,7 +265,7 @@ begin
   inherited;
   if Key = VK_RETURN then
   begin
-    CarregarCampos();
+    PreencherCamposForm();
     VerificaBotoes(FOperacao);
     FOperacao := opEditar;
     BtnAlterar.Click;
@@ -295,13 +278,13 @@ begin
   inherited;
   FOperacao := opNovo;
   VerificaBotoes(FOperacao);
-  LimpaCampos(FOperacao);
+  LimpaCamposForm(FOperacao);
 end;
 
 procedure TFrmCadProduto.BtnPesquisarClick(Sender: TObject);
 begin
   inherited;
-  PreencherGrid();
+  PreencherGridProdutos();
 end;
 
 procedure TFrmCadProduto.BtnAlterarClick(Sender: TObject);
@@ -315,16 +298,11 @@ end;
 procedure TFrmCadProduto.BtnGravarClick(Sender: TObject); var lRetorno: string;
 begin
   inherited;
-  if not ValidarDados then
+  if GravarDados() then
   begin
-    Exit;
-  end
-  else
-  begin
-    GravarDados();
     FOperacao := opNavegar;
     VerificaBotoes(FOperacao);
-    LimpaCampos(FOperacao);
+    LimpaCamposForm(FOperacao);
   end;
 end;
 
@@ -334,7 +312,7 @@ begin
   if FOperacao = opNovo then
   begin
     FOperacao := opInicio;
-    LimpaCampos(FOperacao);
+    LimpaCamposForm(FOperacao);
   end;
 
   if FOperacao = opEditar then
@@ -350,8 +328,37 @@ end;
 procedure TFrmCadProduto.BtnExcluirClick(Sender: TObject);
 begin
   inherited;
-  Excluir();
-  DsProdutos.DataSet.Refresh;
+  if MessageDlg('Deseja realmente excluir o produto selecionado ?',mtConfirmation, [mbYes, mbNo],0) = IDYES then
+  begin
+    if FProdutoController.ExecutarTransacao(
+      procedure
+      begin
+        FProdutoController.Excluir(DsProdutos.DataSet.FieldByName('COD_PRODUTO').AsInteger, sErro);
+      end, sErro) then
+      MessageDlg('Produto excluído com sucesso!', mtInformation, [mbOk], 0)
+    else
+      raise Exception.Create(sErro);
+
+    DsProdutos.DataSet.Refresh;
+  end;
+end;
+
+function TFrmCadProduto.GetDataSource: TDataSource;
+begin
+   DBGridProdutos.DataSource := FProdutoController.GetDataSource();
+end;
+
+function TFrmCadProduto.ValidarDados: Boolean;
+var LErro: TCampoInvalido;
+begin
+  Result := FProdutoController.ValidarDados(EdtDescricao.Text, EdtPrecoUnitario.Text, LErro);
+  if not Result then
+  begin
+    MostrarMensagemErro(LErro);
+    Exit(False);
+  end;
+
+  Result := True;
 end;
 
 procedure TFrmCadProduto.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);

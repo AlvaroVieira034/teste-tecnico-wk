@@ -2,7 +2,7 @@ unit iproduto.repository;
 
 interface
 
-uses produto.model, Data.DB;
+uses produto.model, Data.DB, System.SysUtils;
 
 
 type
@@ -11,6 +11,7 @@ type
     function Inserir(FProduto: TProduto; out sErro: string): Boolean;
     function Alterar(FProduto: TProduto; iCodigo: Integer; out sErro: string): Boolean;
     function Excluir(iCodigo: Integer; out sErro : string): Boolean;
+    function ExecutarTransacao(AOperacao: TProc; var sErro: string): Boolean;
 
   end;
 

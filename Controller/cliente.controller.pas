@@ -2,49 +2,54 @@ unit cliente.controller;
 
 interface
 
-uses cliente.model, cliente.repository, conexao.service, System.SysUtils, FireDAC.Comp.Client, FireDAC.Stan.Param,
-  Data.DB;
+uses cliente.model, cliente.repository, icliente.repository, cliente.service, icliente.service, conexao.service,
+     System.SysUtils, FireDAC.Comp.Client, FireDAC.Stan.Param, Data.DB, untFormat, biblioteca;
 
 type
-  TCampoInvalido = (ciData, ciCliente, ciValor, ciValorZero);
+  TCampoInvalido = (ciNome, ciCpfCnpj, ciCidade, ciUF, ciCPF, ciCNPJ);
   TClienteController = class
 
   private
     FCliente: TCliente;
-    FClienteRepo : TClienteRepository;
+    FClienteRepository : TClienteRepository;
+    FClienteService : TClienteService;
 
   public
-    constructor Create();
+    constructor Create(AClienteRepository: IClienteRepository; AClienteService: IClienteService);
     destructor Destroy; override;
-    procedure PreencherGrid(APesquisa, ACampo: string);
-    procedure PreencherComboCliente;
-    procedure CarregarCampos(FCliente: TCliente; ACodigo: Integer);
+    procedure PreencherGridClientes(APesquisa, ACampo: string);
+    procedure PreencherCamposForm(FCliente: TCliente; ACodigo: Integer);
+    procedure PreencherComboClientes;
     function Inserir(FCliente: TCliente; out sErro: string): Boolean;
     function Alterar(FCliente: TCliente; ACodigo: Integer; out sErro: string): Boolean;
     function Excluir(ACodigo: Integer; out sErro : string): Boolean;
     function GetDataSource: TDataSource;
+    function ValidarDados(const ANomeCliente, ACpfCnpj, ACidade, AUF: string; out AErro: TCampoInvalido): Boolean;
+    function VerificaClienteUtilizado(ACodigo: Integer): Boolean;
+    function ExecutarTransacao(AOperacao: TProc; var sErro: string): Boolean;
 
   end;
-
 
 implementation
 
 { TClienteController }
 
-constructor TClienteController.Create;
+constructor TClienteController.Create(AClienteRepository: IClienteRepository; AClienteService: IClienteService);
 begin
   FCliente := TCliente.Create();
-  FClienteRepo := TClienteRepository.Create();
+  FClienteRepository := TClienteRepository.Create();
+  FClienteService := TClienteService.Create();
 end;
 
 destructor TClienteController.Destroy;
 begin
   FCliente.Free;
-  FClienteRepo.Free;
+  FClienteRepository.Free;
+  FClienteService.Free;
   inherited;
 end;
 
-procedure TClienteController.PreencherGrid(APesquisa, ACampo: string);
+procedure TClienteController.PreencherGridClientes(APesquisa, ACampo: string);
 var LCampo, SErro: string;
 begin
   try
@@ -60,44 +65,111 @@ begin
     if ACampo = '' then
       LCampo := 'cli.des_nomecliente';
 
-    FClienteRepo.PreencherGrid(APesquisa, LCampo);
+    FClienteService.PreencherGridClientes(APesquisa, LCampo);
   except on E: Exception do
     begin
-      SErro := 'Ocorreu um erro ao pesquisar a venda!' + sLineBreak + E.Message;
+      SErro := 'Ocorreu um erro ao pesquisar o cliente!' + sLineBreak + E.Message;
       raise;
     end;
   end;
 end;
 
-procedure TClienteController.PreencherComboCliente;
+procedure TClienteController.PreencherCamposForm(FCliente: TCliente; ACodigo: Integer);
+var sErro: string;
 begin
-  FClienteRepo.PreencherComboCliente();
+  try
+    FClienteService.PreencherCamposForm(FCliente, ACodigo);
+  except on E: Exception do
+    begin
+      sErro := 'Ocorreu um erro ao carregar o cliente!' + sLineBreak + E.Message;
+      raise;
+    end;
+  end;
+end;
+
+procedure TClienteController.PreencherComboClientes;
+begin
+  FClienteService.PreencherComboClientes();
 end;
 
 function TClienteController.Inserir(FCliente: TCliente; out sErro: string): Boolean;
 begin
-
-end;
-
-procedure TClienteController.CarregarCampos(FCliente: TCliente; ACodigo: Integer);
-begin
-
+  Result := FClienteRepository.Inserir(FCliente, sErro);
 end;
 
 function TClienteController.Alterar(FCliente: TCliente; ACodigo: Integer; out sErro: string): Boolean;
 begin
-
+  Result := FClienteRepository.Alterar(FCliente, ACodigo, sErro);
 end;
 
 function TClienteController.Excluir(ACodigo: Integer; out sErro: string): Boolean;
 begin
-
+  Result := FClienteRepository.Excluir(ACodigo, sErro);
 end;
-
 
 function TClienteController.GetDataSource: TDataSource;
 begin
-  Result := FClienteRepo.GetDataSource;
+  Result := FClienteService.GetDataSource;
+end;
+
+function TClienteController.ValidarDados(const ANomeCliente, ACpfCnpj, ACidade, AUF: string; out AErro: TCampoInvalido): Boolean;
+var LCpf, LCnpj: string;
+begin
+  if ANomeCliente = EmptyStr then
+  begin
+    AErro := ciNome;
+    Exit;
+  end;
+
+  if ACpfCnpj = EmptyStr then
+  begin
+    AErro := ciCpfCnpj;
+    Exit;
+  end;
+
+  if Length(ACpfCnpj) = 14 then
+  begin
+    LCpf := SoNumeros(ACpfCnpj);
+    if not ValidarCPF(LCpf) then
+    begin
+      AErro := ciCPF;
+      Exit;
+    end;
+  end;
+
+  if Length(ACpfCnpj) = 18 then
+  begin
+    LCnpj := SoNumeros(ACpfCnpj);
+    if not ValidarCNPJ(LCnpj) then
+    begin
+      AErro := ciCNPJ;
+      Exit;
+    end;
+  end;
+
+  if ACidade = EmptyStr then
+  begin
+    AErro := ciCidade;
+    Exit;
+  end;
+
+  if AUF = EmptyStr then
+  begin
+    AErro := ciUF;
+    Exit;
+  end;
+
+  Result := True;
+end;
+
+function TClienteController.VerificaClienteUtilizado(ACodigo: Integer): Boolean;
+begin
+  Result := FClienteService.VerificaClienteUtilizado(ACodigo);
+end;
+
+function TClienteController.ExecutarTransacao(AOperacao: TProc; var sErro: string): Boolean;
+begin
+  Result := FClienteRepository.ExecutarTransacao(AOperacao, sErro);
 end;
 
 end.
